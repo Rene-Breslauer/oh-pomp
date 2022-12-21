@@ -1,0 +1,172 @@
+{%- if section.settings.enable_newsletter_popup -%}
+    {%- liquid
+        assign newsletter_title = section.settings.title | escape
+        assign newsletter_subtitle = section.settings.subtitle | escape
+        assign newsletter_btn_label = section.settings.btn_label | escape | default: 'Yes Please'
+        assign newsletter_close_text = section.settings.close_text | escape | default: 'No thanks'
+        assign newsletter_bg_image = section.settings.image
+        assign newsletter_border = section.settings.image_border
+        assign newsletter_placeholder = section.settings.placeholder | escape | default: 'Email Address'
+        assign newsletter_button_toggle_label = section.settings.button_toggle_label | default: 'Get 15% Off'
+    -%}
+
+    <modal-opener class="no-js-hidden" data-modal="#PopupModal-newsletter">
+        <button class="btn
+            fixed
+            top-1/2
+            -translate-y-1/2
+            -right-[4.5rem]
+            -rotate-90
+            !flex
+            items-center
+            justify-center
+            z-10" type="button" aria-haspopup="dialog">
+            {%- render 'icon-oh' -%}
+            <span class="ml-2">{{ newsletter_button_toggle_label }}</span>
+        </button>
+    </modal-opener>
+
+    <newsletter-popup id="PopupModal-newsletter">
+        <div role="dialog" aria-label="" aria-modal="true" class="popup__content !min-h-[40rem] !max-w-screen-md !bg-transparent" tabindex="-1">
+            <div class="popup__inner min-h-[34rem] flex items-center justify-end !pt-0 ">
+                <div class="max-w-[44rem]">
+                    {%- if newsletter_title != blank -%}
+                        <h2 class="text-center mb-0">{{ newsletter_title }}</h2>
+                    {%- endif -%}
+
+                    {%- if newsletter_subtitle != blank -%}
+                        <p class="pt-2 text-center tracking-normal text-lg max-w-[35rem] mx-auto">{{ newsletter_subtitle }}</p>
+                    {%- endif -%}
+
+                    <div class="mt-6">
+                        {% form 'customer' %}
+                            <input type="hidden" name="contact[tags]" value="newsletter">
+                            <div class="newsletter-form__field-wrapper">
+                                <div class="field">
+                                    <input
+                                        id="NewsletterForm--{{ section.id }}"
+                                        type="email"
+                                        name="contact[email]"
+                                        class="field__input"
+                                        value="{{ form.email }}"
+                                        aria-required="true"
+                                        autocorrect="off"
+                                        autocapitalize="off"
+                                        autocomplete="email"
+                                        {% if form.errors %}
+                                            autofocus
+                                            aria-invalid="true"
+                                            aria-describedby="Newsletter-error--{{ section.id }}"
+                                        {% elsif form.posted_successfully? %}
+                                            aria-describedby="Newsletter-success--{{ section.id }}"
+                                        {% endif %}
+                                        placeholder="{{ 'newsletter.label' | t }}"
+                                        required
+                                        >
+                                    <label class="field__label" for="NewsletterForm--{{ section.id }}">
+                                        {{ newsletter_placeholder }}
+                                    </label>
+                                </div>
+                                <button id="SubmitBtn-newsletterPopup" type="submit" class="btn w-full uppercase mt-4" name="submit" aria-label="{{ 'newsletter.button_label' | t }}">
+                                    {{ newsletter_btn_label }}
+                                </button>
+                            </div>
+                        {%- endform -%}
+                    </div>
+
+                    <div class="mt-8 text-center">
+                        <button id="ModalCloseSecondary-newsletter" type="button" aria-label="{{ 'accessibility.close' | t }}" class="uppercase text-sm text-silver hover:opacity-70">
+                            {{ newsletter_close_text }}
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            {%- if newsletter_bg_image -%}
+                {%- render 'img' image: newsletter_bg_image -%}
+            {%- endif -%}
+            
+            {%- if newsletter_border -%}
+                <img src="{{ newsletter_border | image_url: width: newsletter_border.width }}"
+                    width="{{ newsletter_border.width }}"
+                    height="{{ newsletter_border.height }}"
+                    alt="Border"
+                    loading="lazy"
+                    class="absolute top-0 bottom-0 right-0 left-0 w-full h-full -z-[1]">
+            {%- endif -%}
+        </div>
+    </newsletter-popup>
+
+    <script>
+        window.addEventListener('DOMContentLoaded', (event) => {
+            const newsletter_popup = document.getElementById('PopupModal-newsletter');
+            const newsletter_popup_active = Cookies.get('newsletter_popup');
+            if (!newsletter_popup_active || newsletter_popup_active === undefined || newsletter_popup_active !== 'active') {
+                setTimeout(() => {
+                    document.body.classList.add('overflow-hidden');
+                    newsletter_popup.setAttribute('open', '');
+                }, 1500);
+            }
+        });
+    </script>
+{%- endif -%}
+  
+{% schema %}
+{
+    "name": "Popup newsletter",
+    "settings": [
+        {
+            "type": "checkbox",
+            "id": "enable_newsletter_popup",
+            "label": "Enable newsletter popup",
+            "default": true
+        },
+        {
+            "type": "text",
+            "id": "button_toggle_label",
+            "label": "Button toggle label",
+            "default": "Get 15% off"
+        },
+        {
+            "type": "image_picker",
+            "id": "image",
+            "label": "Background image"
+        },
+        {
+            "type": "image_picker",
+            "id": "image_border",
+            "label": "Border"
+        },
+        {
+            "type": "text",
+            "id": "title",
+            "label": "Title",
+            "default": "JOIN THE OH POMP! FAM"
+        },
+        {
+            "type": "text",
+            "id": "subtitle",
+            "label": "Subtitle",
+            "default": "Sign up for sneak peaks, special offers and more. Plus get 15% off your first purchase."
+        },
+        {
+            "type": "text",
+            "id": "placeholder",
+            "label": "Placeholder",
+            "default": "Email Address"
+        },
+        {
+            "type": "text",
+            "id": "btn_label",
+            "label": "Submit button label",
+            "default": "Yes Please"
+        },
+        {
+            "type": "text",
+            "id": "close_text",
+            "label": "Close popup label",
+            "default": "No thanks"
+        }
+    ]
+}
+{% endschema %}

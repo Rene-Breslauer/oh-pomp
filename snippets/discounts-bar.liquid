@@ -1,0 +1,99 @@
+{% if settings.cart_step_1_price > 0 and
+      settings.cart_step_2_price > 0 and
+      settings.cart_step_3_price > 0
+%}
+  {% assign cart_step_1_price = settings.cart_step_1_price | times: 100 %}
+  {% assign cart_step_2_price = settings.cart_step_2_price | times: 100 %}
+  {% assign cart_step_3_price = settings.cart_step_3_price | times: 100 %}
+
+  <style>
+    .cart__discounts-bar {
+
+    }
+    .cart__discounts-bar__step {
+      width: 34%;
+      margin-left: -1%;
+    }
+    .cart__discounts-bar__step p {
+      font-size: 10px;
+      line-height: 10px;
+      text-transform: uppercase;
+      margin: 0;
+    }
+    .active.cart__discounts-bar__step p {
+      opacity: .3;
+    }
+
+    .cart__discounts-bar__step__progress {
+      width: 100%;
+      height: 6px;
+      margin: 5px 0;
+      position: relative;
+      z-index: 1;
+      border: 1px solid #D44040;
+      border-radius: 3px;
+      background: #fff;
+    }
+    .cart__discounts-bar__step__progress:after {
+      content: '';
+      display: block;
+      width: 0;
+      height: 0;
+      border-top: 3px solid transparent;
+      border-bottom: 3px solid transparent;
+      border-left: 3px solid #D44040;
+      position: absolute;
+      top: -1px;
+      right: -3px;
+      z-index: 2;
+    }
+    #dStep-1 {
+      z-index: 3;
+    }
+    #dStep-2 {
+      z-index: 2;
+    }
+    #dStep-3 .cart__discounts-bar__step__progress:after {
+      display: none;
+    }
+    .active > .cart__discounts-bar__step__progress {
+      background: #D44040;
+    }
+  </style>
+
+  <div class="py-8 {% unless template contains 'cart' %}px-14{% endunless %} border-b border-flash w-full">
+    <div class="cart__discounts-bar flex flex-wrap">
+
+      {% assign hideText = '' %}
+      {% if cart.original_total_price > cart_step_3_price %}
+        {% assign hideText = 'hidden' %}
+
+        <p class="w-full text-center">{{ settings.cart_discount_text_done }}</p>
+
+      {% endif %}
+
+        {% assign cart_step_1_price_limit = cart_step_1_price | minus: cart.original_total_price %}
+        <div id="dStep-1" class="cart__discounts-bar__step text-right {% if cart_step_1_price_limit < 0 %}active{% endif %}">
+          <p class="{{ hideText }}">{{ cart_step_1_price | money_without_trailing_zeros }}</p>
+          <div class="cart__discounts-bar__step__progress"></div>
+          <div class="cart__discounts-bar__step__price {{ hideText }}"><p>{{ settings.cart_step_1_discount }}% off</p></div>
+        </div>
+
+        {% assign cart_step_2_price_limit = cart_step_2_price | minus: cart.original_total_price %}
+        <div id="dStep-2" class="cart__discounts-bar__step text-right {% if cart_step_2_price_limit < 0 %}active{% endif %}">
+          <p class="{{ hideText }}">{{ cart_step_2_price | money_without_trailing_zeros }}</p>
+          <div class="cart__discounts-bar__step__progress"></div>
+          <div class="cart__discounts-bar__step__price {{ hideText }}"><p>{{ settings.cart_step_2_discount }}% off</p></div>
+        </div>
+
+        {% assign cart_step_3_price_limit = cart_step_3_price | minus: cart.original_total_price %}
+        <div id="dStep-3" class="cart__discounts-bar__step text-right {% if cart_step_3_price_limit < 0 %}active{% endif %}">
+          <p class="{{ hideText }}">{{ cart_step_3_price | money_without_trailing_zeros }}</p>
+          <div class="cart__discounts-bar__step__progress"></div>
+          <div class="cart__discounts-bar__step__price {{ hideText }}"><p>{{ settings.cart_step_3_discount }}% off</p></div>
+        </div>
+
+    </div>
+  </div>
+
+{% endif %}

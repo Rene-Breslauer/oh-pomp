@@ -1,0 +1,140 @@
+{%- if section.blocks.size > 0 -%}
+	{%- liquid
+        assign padding_top = section.settings.padding_top | default: 0
+        assign padding_bottom = section.settings.padding_bottom | default: 0
+        assign margin_top = section.settings.margin_top | default: 0
+        assign margin_bottom = section.settings.margin_bottom | default: 0
+        assign heading = section.settings.title | escape
+        assign anchor_id = heading | handleize
+    -%}
+
+	{%- render 'offset' 
+        id: section.id
+        padding_top: padding_top, 
+        padding_bottom: padding_bottom,
+        margin_top: margin_top,
+        margin_bottom: margin_bottom
+    -%}
+	
+	<div id="{{ anchor_id }}">
+      <section id="section-{{ section.id }}">
+          <div class="page-width">
+            <div class="max-w-[91rem] mx-auto">
+              {%- if heading != blank -%}
+                  <h2 class="text-lg xl:text-2xl mb-6">{{ heading }}</h2>
+              {%- endif -%}
+
+              <ul class="border-b border-silver2">
+              	{%- for block in section.blocks -%}
+                	{%- liquid
+                    	assign q = block.settings.title | escape
+                        assign a = block.settings.a
+                    -%}
+                	{%- if q != blank
+                    	and a != blank -%}
+                		<li itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
+                          <details class="dropdown-effect">
+                            <summary>
+                            	<h4 class="border-t
+                                     border-silver2
+                                     py-8
+                                     pr-12
+                                     tracking-normal
+                                     relative">
+                                   {{ q }}
+                                   <div class="flex
+                                        items-center
+                                        justify-center
+                                        text-lg
+                                        rounded-full
+                                        border
+                                        border-silver2
+                                        w-[2.4rem]
+                                        h-[2.4rem]
+                                        absolute
+                                        right-0
+                                        top-1/2
+                                        transform
+                                        -translate-y-1/2">
+                                      <svg class="hidden-open" xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 10 10" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M5 0C5.27614 0 5.5 0.223858 5.5 0.5V4.5H9.5C9.77614 4.5 10 4.72386 10 5C10 5.27614 9.77614 5.5 9.5 5.5H5.5V9.5C5.5 9.77614 5.27614 10 5 10C4.72386 10 4.5 9.77614 4.5 9.5L4.5 5.5H0.5C0.223858 5.5 0 5.27614 0 5C0 4.72386 0.223858 4.5 0.5 4.5H4.5V0.5C4.5 0.223858 4.72386 0 5 0Z" fill="#303030"/></svg>
+                                      <svg class="hidden-closed" xmlns="http://www.w3.org/2000/svg" width="10" height="2" viewBox="0 0 10 2" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M0 1C0 0.723858 0.223858 0.5 0.5 0.5H9.5C9.77614 0.5 10 0.723858 10 1C10 1.27614 9.77614 1.5 9.5 1.5H0.5C0.223858 1.5 0 1.27614 0 1Z" fill="#303030"/></svg>
+                                	</div>
+                            	</h4>
+                            </summary>
+                            <div class="pr-12 pb-8 rte" itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+								              {{ a }}
+                            </div>
+                          </details>
+                		</li>
+                	{%- endif -%}
+                {%- endfor -%}
+              </ul>
+            </div>
+          </div>
+      </section>
+	</div>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "FAQ",
+  "settings": [
+	{
+      "type": "number",
+      "id": "padding_top",
+      "label": "Padding top (rem)",
+      "default": 0,
+      "info": "1rem = 10px"
+    },
+    {
+      "type": "number",
+      "id": "padding_bottom",
+      "label": "Padding bottom (rem)",
+      "default": 0,
+      "info": "1rem = 10px"
+    },
+    {
+      "type": "number",
+      "id": "margin_top",
+      "label": "Margin top (rem)",
+      "default": 100,
+      "info": "1rem = 10px"
+    },
+    {
+      "type": "number",
+      "id": "margin_bottom",
+      "label": "Margin bottom (rem)",
+      "default": 100,
+      "info": "1rem = 10px"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Title"
+    }
+  ],
+  "blocks": [
+    {
+    "type": "faq",
+    "name": "faq",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Q"
+        },
+        {
+          "type": "richtext",
+          "id": "a",
+          "label": "A"
+        }
+      ]
+    }
+  ],
+  "presets":[
+    {
+    	"name": "FAQ"
+    }
+  ]
+}
+{% endschema %}

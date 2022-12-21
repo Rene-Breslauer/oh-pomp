@@ -1,0 +1,87 @@
+
+<div class="page-width">
+  <div class="max-w-[90rem] mx-auto pt-10 xl:pt-14 pb-8 xl:pb-28">
+    
+    <h1 class="text-2xl xl:text-5xl text-center mb-0">{{ 'customer.account.title' | t }}</h1>
+    
+    <div class="mt-10 xl:mt-20">
+      	<h2 class="text-lg xl:text-2xl mb-0">{{ 'customer.orders.title' | t }}</h2>
+      
+      	<div class="mt-6 xl:mt-10">
+          {% paginate customer.orders by 20 %}
+          	{%- if customer.orders.size > 0 -%}
+              <table class="w-full text-center border-collapse customer-table" role="table">
+                    <caption class="visually-hidden">{{ 'customer.orders.title' | t }}</caption>
+                    <thead class="hidden xl:table-header-group" role="rowgroup">
+                        <tr role="row">
+                            <th class="border border-silver2 bg-primary py-4 px-6 uppercase text-sm text-silver2 font-normal" id="ColumnOrder" scope="col" role="columnheader">{{ 'customer.orders.order_number' | t }}</th>
+                            <th class="border border-silver2 bg-primary py-4 px-6 uppercase text-sm text-silver2 font-normal" id="ColumnDate" scope="col" role="columnheader">{{ 'customer.orders.date' | t }}</th>
+                            <th class="border border-silver2 bg-primary py-4 px-6 uppercase text-sm text-silver2 font-normal" id="ColumnFulfillment" scope="col" role="columnheader">{{ 'customer.orders.fulfillment_status' | t }}</th>
+                            <th class="border border-silver2 bg-primary py-4 px-6 uppercase text-sm text-silver2 font-normal" id="ColumnQty" scope="col" role="columnheader">{{ 'customer.order.quantity' | t }}</th>
+                            <th class="border border-silver2 bg-primary py-4 px-6 uppercase text-sm text-silver2 font-normal" id="ColumnTotal" scope="col" role="columnheader">{{ 'customer.orders.total' | t }}</th>
+                            <th class="border border-silver2 bg-primary py-4 px-6 uppercase text-sm text-silver2 font-normal" id="ColumnView" scope="col" role="columnheader"></th>
+                        </tr>
+                    </thead>
+                	<tbody role="rowgroup">
+                      {%- for order in customer.orders -%}
+                      	{%- assign even = forloop.index | modulo: 2 -%}
+                        <tr role="row" class="flex flex-col -mt-[1px] xl:mt-0 w-full xl:table-row {% unless forloop.last %}mb-8{% endunless %} xl:mb-0 {% if even == 0 %}bg-flash{% endif %}">
+                          <td class="border border-silver2 py-5 px-6 flex xl:table-cell text-right xl:text-center"
+                            id="RowOrder"
+                            role="cell"
+                            headers="ColumnOrder"
+                            data-label="{{ 'customer.orders.order_number' | t }}"
+                          >
+                            <a href="{{ order.customer_url }}" class="underline" aria-label="{{ 'customer.orders.order_number_link' | t: number: order.name }}">
+                              {{ order.name }}
+                            </a>
+                          </td>
+                          <td class="border border-silver2 py-5 px-6 uppercase flex xl:table-cell text-right xl:text-center" headers="RowOrder ColumnDate" role="cell" data-label="{{ 'customer.orders.date' | t }}">
+                            {{ order.created_at | date: '%d.%m.%Y' }}
+                          </td>
+                          <td class="border border-silver2 py-5 px-6 uppercase flex xl:table-cell text-right xl:text-center" headers="RowOrder ColumnFulfillment" role="cell" data-label="{{ 'customer.orders.fulfillment_status' | t }}">
+                            {{ order.fulfillment_status_label }}
+                          </td>
+                          {%- liquid
+                          	assign qty = 0
+                            for item in order.line_items
+                            	assign qty = qty | plus: item.quantity
+                            endfor
+                          -%}
+                          <td class="border border-silver2 py-5 px-6 uppercase flex xl:table-cell text-right xl:text-center" headers="RowOrder ColumnQty" role="cell" data-label="{{ 'customer.order.quantity' | t }}">
+                            x {{ qty }}
+                          </td>
+                          <td class="border border-silver2 py-5 px-6 flex xl:table-cell text-right xl:text-center" headers="RowOrder ColumnTotal" role="cell" data-label="{{ 'customer.orders.total' | t }}">
+                            {{ order.total_price | money }}</td>
+                          <td class="border border-silver2 py-5 px-6 flex xl:table-cell text-right xl:text-center" headers="RowOrder ColumnView" role="cell" data-label="">
+                            <a href="{{ order.customer_url }}" class="btn btn--inverted btn--secondary !py-[.7rem] flex-grow w-full xl:w-auto">{{ 'customer.orders.view' | t }}</a></td>
+                        </tr>
+                      {%- endfor -%}
+                    </tbody>
+              </table>
+
+              {%- render 'pagination', paginate: paginate -%}
+          	{%- else -%}
+          		<p class="text-lg">{{ 'customer.orders.none' | t }}</p>
+          	{%- endif -%}
+          {% endpaginate %}
+      	</div>
+    </div>
+    
+    <div class="mt-12">
+    	<h2 class="text-lg xl:text-2xl mb-0">{{ 'customer.account.details' | t }}</h2>
+      
+      	<div class="mt-6 xl:mt-10 pt-6 xl:pt-10 pb-8 xl:pb-12 px-8 xl:px-12 bg-flash sm:max-w-[26.8rem]">
+          	<h4>{{ 'customer.account.default_address' | t }}</h4>
+          	
+          	<div class="mt-6 text-lg">
+          		{{ customer.default_address | format_address }}
+          	</div>
+          	
+          	<div class="mt-8">
+              	<a href="{{ routes.account_addresses_url }}" class="btn w-full">{{ 'customer.account.view_addresses' | t }} ({{ customer.addresses_count }})</a>
+          	</div>
+      	</div>
+    </div>
+  </div>
+</div>

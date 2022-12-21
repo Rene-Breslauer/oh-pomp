@@ -1,0 +1,413 @@
+{%- liquid
+    assign sort_by = results.sort_by | default: results.default_sort_by
+    assign total_active_values = 0
+    if results.url
+      assign results_url = results.url
+    else
+      assign terms = results.terms | escape
+      assign results_url = '?q=' | append: terms | append: '&options%5Bprefix%5D=last&sort_by=' | append: sort_by
+    endif
+-%}
+<menu-drawer class="xl:hidden" data-breakpoint="mobile">
+    <details>
+      <summary>
+        <span class="btn w-full">
+            {{ 'products.facets.refine_by' | t }}
+        </span>
+      </summary>
+      <facet-filters-form>
+        <form id="FacetFiltersFormMobile" class="fixed
+                top-0
+                left-0
+                bottom-0
+                right-0
+                w-screen
+                min-h-screen
+                pb-40
+                z-30
+                bg-white
+                overflow-y-auto
+                mobile-facets__inner
+                transition-transform
+                duration-200
+                ease-linear
+                transform
+                -translate-x-full">
+          <div class="">
+            <div class="py-10 mb-8 px-8 border-b border-silver2">
+              <div class="flex items-center justify-between">
+                <h2 class="text-lg tracking-normal normal-case mb-0">
+                    {{ 'products.facets.refine_by' | t }}
+                </h2>
+                <button type="button" class="flex p-3 -mr-3" onclick="this.closest('menu-drawer').querySelector('summary').click()">
+                    {%- render 'icon-close-small' -%}
+                </button>
+              </div>
+            </div>
+
+            <div class="page-width">
+                <div class="active-facets active-facets-mobile flex flex-wrap w-full">
+                    {%- for filter in results.filters -%}
+                      {%- for value in filter.active_values -%}
+                        <facet-remove>
+                          <a href="{{ value.url_to_remove }}" class="mr-2.5 
+                                mb-2.5 
+                                py-3
+                                px-6 
+                                rounded-[1.6rem] 
+                                bg-flash 
+                                uppercase
+                                flex
+                                justify-center
+                                items-center">
+                              <span class="mr-4">{{ value.label | escape }}</span>
+                              {% render 'icon-close-small' %}
+                              <span class="visually-hidden">{{ 'products.facets.clear_filter' | t }}</span>
+                          </a>
+                        </facet-remove>
+                      {%- endfor -%}
+                      {% if filter.type == "price_range" %}
+                        {%- if filter.min_value.value != nil or filter.max_value.value != nil -%}
+                          <facet-remove>
+                            <a href="{{ filter.url_to_remove }}" class="mr-2.5 
+                                mb-2.5 
+                                py-3
+                                px-6 
+                                rounded-[1.6rem] 
+                                bg-flash 
+                                uppercase
+                                flex
+                                justify-center
+                                items-center">
+                              <span class="mr-4">
+                                {%- if filter.min_value.value -%}{{ filter.min_value.value | money }}{%- else -%}{{ 0 | money }}{%- endif -%}-{%- if filter.max_value.value -%}{{ filter.max_value.value | money }}{%- else -%}{{ filter.range_max | money }}{%- endif -%}
+                              </span>
+                              {% render 'icon-close-small' %}
+                                <span class="visually-hidden">{{ 'products.facets.clear_filter' | t }}</span>
+                            </a>
+                          </facet-remove>
+                        {%- endif -%}
+                      {% endif %}
+                    {%- endfor -%}
+                </div>
+
+                <div class="mt-5">
+                    {%- if section.settings.enable_filtering -%}
+                      {%- for filter in results.filters -%}
+                        {% case filter.type %}
+                        {% when 'boolean' or 'list' %}
+                            <details class="dropdown-effect  
+                                border-t 
+                                border-b 
+                                -mt-[1px] 
+                                border-silver2 
+                                js-filter
+                                facets__disclosure-vertical" id="Details-Mobile-{{ forloop.index }}-{{ section.id }}" data-index="mobile-{{ forloop.index }}"{% if filter_type == 'vertical' and forloop.index == 1 %} open{% endif %}>
+                                <summary aria-label="{{ filter.label }} ({{ 'products.facets.filters_selected.one' | t: count: filter.active_values.size }})">
+                                  <h4 class="py-8 flex items-center justify-between">
+                                    <span>{{ filter.label | escape }}{%- if filter_type == 'vertical' -%}<span class="facets__selected no-js-hidden{% if filter.active_values.size == 0 %} hidden{% endif %}"> ({{ filter.active_values.size }})</span>{% endif %}</span>
+                                    {%- render 'icon-caret' -%}
+                                  </h4>
+                                </summary>
+                                <div id="FacetMobile-{{ forloop.index }}-{{ section.id }}" class="parent-display pb-4">
+                                  <fieldset class="facets-wrap parent-wrap {% if filter_type == 'vertical' %} facets-wrap-vertical{% endif %}">
+                                    <legend class="visually-hidden">{{ filter.label | escape }}</legend>
+                                    <ul class="
+                                        {% if filter_type != 'vertical' %} 
+                                            facets__list
+                                        {% endif %} 
+                                        no-js-hidden
+                                        {% if filter.label == 'Size' %}
+                                            grid
+                                            grid-cols-5
+                                            gap-2
+                                            filter-custom
+                                            pb-6
+                                        {% elsif filter.label == 'Color' %}
+                                            grid
+                                            grid-cols-6
+                                            gap-x-6
+                                            gap-y-5
+                                            filter-custom
+                                            pb-6
+                                        {% endif %}" role="list">
+                                      {%- for value in filter.values -%}
+                                        {%- if filter.label == 'Size' -%}
+                                            <li class="{% if forloop.index > 20 and filter_type == 'vertical' %} show-more-item hidden{% endif %}">
+                                                <input type="checkbox"
+                                                    class="mobile-facets__checkbox overflow-hidden absolute h-0 w-0 -z-50"
+                                                    name="{{ value.param_name }}"
+                                                    value="{{ value.value }}"
+                                                    id="Filter-mobile-{{ filter.label | escape }}-{{ forloop.index }}"
+                                                    {% if value.active %}checked{% endif %}
+                                                    {% if value.count == 0 and value.active == false %}disabled{% endif %}
+                                                >
+                                                <label data-id="{{ value.param_name | handleize }}-{{ value.value | handleize }}" for="Filter-mobile-{{ filter.label | escape }}-{{ forloop.index }}" class="w-full 
+                                                    p-[0.6rem] 
+                                                    text-center
+                                                    cursor-pointer 
+                                                    border 
+                                                    border-silver2 
+                                                    rounded-none
+                                                    block
+                                                    transition-all
+                                                    duration-150
+                                                    ease-linear
+                                                    {% if value.count == 0 and value.active == false %} 
+                                                        bg-flash 
+                                                        text-silver
+                                                        relative
+                                                        pointer-events-none
+                                                        before:content-['']
+                                                        before:absolute
+                                                        before:w-[1px]
+                                                        before:h-full
+                                                        before:left-1/2
+                                                        before:transform
+                                                        before:-translate-x-1/2
+                                                        before:top-0
+                                                        before:skew-x-[45deg]
+                                                        before:bg-silver2
+                                                        before:z-20
+                                                    {% endif %}">
+                                                    {{ value.label | escape }}
+                                                </label>
+                                            </li>
+                                        {%- elsif filter.label == 'Color' -%}
+                                            <li class="{% if forloop.index > 12 and filter_type == 'vertical' %} show-more-item hidden{% endif %}">
+                                                <input type="checkbox"
+                                                    class="mobile-facets__checkbox overflow-hidden absolute h-0 w-0 -z-50"
+                                                    name="{{ value.param_name }}"
+                                                    value="{{ value.value }}"
+                                                    id="Filter-mobile-{{ filter.label | escape }}-{{ forloop.index }}"
+                                                    {% if value.active %}checked{% endif %}
+                                                    {% if value.count == 0 and value.active == false %}disabled{% endif %}
+                                                >
+                                                
+                                                <label title="{{ value.value }}" data-id="{{ value.param_name | handleize }}-{{ value.value | handleize }}" for="Filter-mobile-{{ filter.label | escape }}-{{ forloop.index }}" class="p-[0.3rem]
+                                                    block 
+                                                    border 
+                                                    border-silver2 
+                                                    rounded-full
+                                                    cursor-pointer
+                                                    transition-all
+                                                    duration-150
+                                                    ease-linear
+                                                    w-[4.2rem]
+                                                    h-[4.2rem]
+                                                    {% if value.count == 0 and value.active == false %}
+                                                        facet-checkbox--disabled
+                                                    {% endif %}">
+                                                    {%- assign color_value = '#fff' -%}
+                                                    {%- assign swatch_image_url = '' -%}
+                                                    {%- for i in (1..50) -%}
+                                                        {%- capture color_name_index -%}swatch_color_name_{{ forloop.index }}{%- endcapture -%}
+                                                        {%- capture color_index -%}swatch_color_{{ forloop.index }}{%- endcapture -%}
+                                                        {%- capture image_index -%}swatch_image_{{ forloop.index }}{%- endcapture -%}
+                                                        {%- assign color_name = settings[color_name_index] -%}
+                                                        {%- assign color = settings[color_index] -%}
+                                                        {%- assign swatch_image = settings[image_index] -%}
+                                                        {%- if color_name != blank -%}
+                                                            {%- if color_name == value.value -%}
+                                                                {%- if swatch_image -%}
+                                                                    {%- assign swatch_image_url = swatch_image | img_url: '34x34' -%}
+                                                                {%- endif -%}
+            
+                                                                {%- if color != blank -%}
+                                                                    {%- assign color_value = color -%}
+                                                                {%- endif -%}
+                                                            {%- endif -%}
+                                                        {%- endif -%}
+                                                    {%- endfor -%}
+                                                    <span class="w-[3.4rem] 
+                                                        h-[3.4rem]
+                                                        block
+                                                        rounded-full
+                                                        bg-no-repeat
+                                                        bg-cover
+                                                        bg-center" style="{% if swatch_image_url != '' %}background-image:url({{ swatch_image_url }}){% else %}background-color:{{ color_value }}{% endif %}"></span>
+                                                </label>
+                                            </li>
+                                        {%- else -%}
+                                            <li class="{% if forloop.index > 5 and filter_type == 'vertical' %} show-more-item hidden{% endif %}">
+                                                <label for="Filter-mobile-{{ filter.label | escape }}-{{ forloop.index }}" class="relative tracking-normal text-lg mb-6 flex items-center cursor-pointer {% if value.count == 0 and value.active == false %} facet-checkbox--disabled{% endif %}">
+                                                    <input type="checkbox"
+                                                    class="mobile-facets__checkbox 
+                                                        absolute
+                                                        overflow-hidden
+                                                        w-0
+                                                        h-0
+                                                        -m-[-1px]
+                                                        p-0
+                                                        border-0
+                                                        appearance-none
+                                                        z-0"
+                                                    name="{{ value.param_name }}"
+                                                    value="{{ value.value }}"
+                                                    id="Filter-mobile-{{ filter.label | escape }}-{{ forloop.index }}"
+                                                    {% if value.active %}checked{% endif %}
+                                                    {% if value.count == 0 and value.active == false %}disabled{% endif %}
+                                                    >
+                    
+                                                    <svg class="bg-white
+                                                    mr-5 icon-bg" width="1.6rem" height="1.6rem" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+                                                    <rect width="16" height="16" stroke="currentColor" fill="none" stroke-width="1"></rect>
+                                                    </svg>
+                    
+                                                    <svg class="icon 
+                                                    icon-checkmark 
+                                                    invisible 
+                                                    absolute 
+                                                    left-[0.3rem] 
+                                                    z-10 
+                                                    top-1/2
+                                                    transform
+                                                    -translate-y-1/2"
+                                                    width="1.1rem"
+                                                    height="0.7rem"
+                                                    viewBox="0 0 11 7"
+                                                    fill="none"
+                                                    xmlns="http://www.w3.org/2000/svg">
+                    
+                                                    <path d="M1.5 3.5L2.83333 4.75L4.16667 6L9.5 1"
+                                                        stroke="#fff"
+                                                        stroke-width="1.75"
+                                                        stroke-linecap="round"
+                                                        stroke-linejoin="round" />
+                                                    </svg>
+                    
+                                                    <span aria-hidden="true">{{ value.label | escape }}</span>
+                                                    <span class="visually-hidden">{{ value.label | escape }} ({% if value.count == 1 %}{{ 'products.facets.product_count_simple.one' | t: count: value.count }}{% else %}{{ 'products.facets.product_count_simple.other' | t: count: value.count }}{% endif %})</span>
+                                                    <span class="absolute
+                                                    text-sm
+                                                    opacity-50
+                                                    top-1/2
+                                                    transform
+                                                    -translate-y-1/2
+                                                    right-0">{{ value.count }}</span>
+                                                </label>
+                                            </li> 
+                                        {%- endif -%}
+                                      {%- endfor -%}
+                                    </ul>
+                                  </fieldset>
+                                  {%- liquid
+                                        assign threshold = 5
+                                        if filter.label == 'Size'
+                                            assign threshold = 20
+                                        elsif filter.label == 'Color'
+                                            assign threshold = 12
+                                        endif
+                                    -%}
+                                  {%- if filter.values.size > threshold and filter_type == 'vertical' -%}
+                                    <show-more-button>
+                                      <button class="button-show-more 
+                                        no-js-hidden
+                                        w-full
+                                        text-center
+                                        bg-flash
+                                        uppercase
+                                        py-1.5
+                                        px-4
+                                        mt-4
+                                        mb-4
+                                        rounded-[1.2rem]" id="Show-More-{{ forloop.index }}-{{ section.id }}" type="button">
+                                        <span class="label-show-more label-text">{{ 'products.facets.show_more' | t }}</span>
+                                        <span class="label-show-less label-text hidden">{{ 'products.facets.show_less' | t }}</span>
+                                      </button>
+                                    </show-more-button>
+                                  {%- endif %}
+                                </div>
+                            </details>
+                        {% when 'price_range' %}
+                          <details id="Details-Mobile-{{ forloop.index }}-{{ section.id }}" class="dropdown-effect  
+                            border-t 
+                            border-b 
+                            -mt-[1px] 
+                            border-silver2 
+                            js-filter" data-index="mobile-{{ forloop.index }}">
+                            <summary aria-label="{{ filter.label }} ({{ 'products.facets.filters_selected.one' | t: count: filter.active_values.size }})">
+                                <h4 class="py-8 flex items-center justify-between">
+                                    <span>{{ filter.label | escape }}</span>
+                                    {%- render 'icon-caret' -%}
+                                </h4>
+                            </summary>
+                            <div id="FacetMobile-{{ forloop.index }}-{{ section.id }}" class="pb-4">
+      
+                              {%- assign max_price_amount = filter.range_max | money | strip_html | escape -%}
+                              <p class="mobile-facets__info uppercase text-sm text-silver2 mb-4">{{ "products.facets.max_price" | t: price: max_price_amount }}</p>
+      
+                              <price-range class="facets__price pb-4 block">
+                                <div id="facets__minmax">
+                                    <p class="text-sm text-silver2 uppercase flex items-center">MIN:&nbsp;<span class="facets__priceMin--mob">{{ filter.min_value.value | money | default: 0 }}</span></p>
+                                    <p class="text-sm text-silver2 uppercase flex items-center mt-2">MAX:&nbsp;<span class="facets__priceMax--mob">{{ filter.max_value.value | money | default: 0 }}</span></p>
+                                </div>
+                                <div class="field mt-4">
+                                  <input class="input__range"
+                                    name="{{ filter.min_value.param_name }}"
+                                    id="Mobile-Filter-{{ filter.label | escape }}-GTE"
+                                    {%- if filter.min_value.value -%}
+                                        {%- if uses_comma_decimals -%}value="{{ filter.min_value.value | money_without_currency | replace: '.', '' | replace: ',', '.' }}"{%- else -%}value="{{ filter.min_value.value | money_without_currency | replace: ',', '' }}"{% endif %}
+                                      {%- else -%}
+                                        value="0"
+                                      {%- endif -%}
+                                    type="range"
+                                    min="0"
+                                    step="1"
+                                    {%- if uses_comma_decimals -%}max="{{ filter.range_max | money_without_currency | replace: '.', '' | replace: ',', '.' }}"{%- else -%}max="{{ filter.range_max | money_without_currency | replace: ',', '' }}"{% endif %}
+                                  >
+                                </div>
+      
+                                <div class="field mt-4">
+                                  <input class="input__range"
+                                    name="{{ filter.max_value.param_name }}"
+                                    id="Mobile-Filter-{{ filter.label | escape }}-LTE"
+                                    {%- if filter.max_value.value -%}
+                                        {%- if uses_comma_decimals -%}
+                                            value="{{ filter.max_value.value | money_without_currency | replace: '.', '' | replace: ',', '.' }}"
+                                        {%- else -%}
+                                            value="{{ filter.max_value.value | money_without_currency | replace: ',', '' }}"
+                                        {% endif %}
+                                      {%- else -%}
+                                        value="{{ filter.range_max }}"
+                                      {%- endif -%}
+                                    type="range"
+                                    min="0"
+                                    step="1"
+                                    {%- if uses_comma_decimals -%}
+                                      max="{{ filter.range_max | money_without_currency | replace: '.', '' | replace: ',', '.' }}"
+                                    {%- else -%}
+                                      max="{{ filter.range_max | money_without_currency | replace: ',', '' }}"
+                                    {% endif %}
+                                  >
+                                </div>
+                              </price-range>
+                            </div>
+                          </details>
+                        {% endcase %}
+                      {%- endfor -%}
+                    {%- endif -%}
+                </div>
+
+                <div class="py-8">
+                    <button type="button" class="btn w-full" onclick="this.closest('menu-drawer').querySelector('summary').click()">
+                        {{ 'products.facets.apply' | t }}
+                    </button>
+                </div>
+            </div>
+
+            
+
+            {% if results.current_vendor or results.current_type %}
+              <input type="hidden" name="q" value="{{ results.current_vendor }}{{ results.current_type }}">
+            {% endif %}
+
+            {%- if results.terms -%}
+              <input type="hidden" name="q" value="{{ results.terms | escape }}">
+              <input name="options[prefix]" type="hidden" value="last">
+            {%- endif -%}
+          </div>
+        </form>
+      </facet-filters-form>
+    </details>
+</menu-drawer>

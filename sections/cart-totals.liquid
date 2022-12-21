@@ -1,0 +1,92 @@
+<div class="pt-6 pb-8 xl:py-12 px-8 xl:px-16 border border-silver2">
+	<div class="flex items-center justify-between pb-8 xl:pb-10 border-b border-silver2">
+		<h2 class="text-1xl xl:text-3xl tracking-normal normal-case mb-0">{{ 'sections.cart.totals_title' | t }}</h2>
+
+		<p class="uppercase text-silver">
+			{{ cart.item_count }}
+			{%- if cart.item_count == 1 -%}
+				{{ 'sections.cart.totals_item' | t }}
+			{%- else -%}
+				{{ 'sections.cart.totals_items' | t }}
+			{%- endif -%}
+		</p>
+	</div>
+
+	{% if settings.cart_promo_type == 'freeshipping' %}
+		{% render 'freeshipping-bar' %}
+	{% else %}
+		{% render 'discounts-bar' %}
+	{% endif %}
+
+	{% if cart.total_discount > 0 %}
+		<div class="flex items-center justify-between py-8 xl:py-10 border-b border-flash">
+			<h4>Total</h4>
+			<p class="text-lg font-bold tracking-normal">{{ cart.original_total_price | money }}</p>
+		</div>
+		<div class="flex items-center justify-between py-8 xl:py-10 border-b border-flash">
+			<h4>Discount</h4>
+			<p class="text-lg font-bold tracking-normal">{{ cart.total_discount | money }}</p>
+		</div>
+	{% endif %}
+
+	<div class="flex items-center justify-between py-8 xl:py-10 border-b border-flash">
+		<h4>{{ 'sections.cart.totals_subtotal' | t }}</h4>
+		<p class="text-lg font-bold tracking-normal" {% if cart.total_discount > 0 %}style="color:#D44040"{% endif %}>{{ cart.total_price | money }}</p>
+	</div>
+
+	{%- if cart.cart_level_discount_applications.size > 0 -%}
+		<div class="flex justify-between py-8 xl:py-10 border-b border-flash">
+			<h4>{{ 'sections.cart.totals_discounts' | t }}</h4>
+			<ul class="text-right" role="list" aria-label="{{ 'customer.order.discount' | t }}">
+				{%- for discount in cart.cart_level_discount_applications -%}
+					<li class="{% unless forloop.last %}mb-3{% endunless %}">
+						{{ discount.title }}
+						(-{{ discount.total_allocated_amount | money }})
+					</li>
+				{%- endfor -%}
+			</ul>
+		</div>
+	{%- endif -%}
+
+	<div class="flex items-center justify-center py-8 xl:py-10">
+		{%- form 'cart', cart -%}
+			{{ form | payment_terms }}
+		{%- endform -%}
+	</div>
+
+	<div>
+		<button type="submit" id="checkout" class="btn w-full !flex items-center justify-center border border-transparent" name="checkout"{% if cart == empty %} disabled{% endif %} form="cart">
+			{%- render 'icon-shield' -%}
+			<span class="ml-3">{{ 'sections.cart.checkout' | t }}</span>
+		</button>
+
+		<a href="/collections/all" class="btn btn--inverted btn--secondary w-full mt-4">
+			{{ 'sections.cart.continue_shopping' | t }}
+		</a>
+	</div>
+
+	<div class="flex items-center justify-center pt-8 xl:pt-10 text-center text-lg">
+		{{ 'sections.cart.taxes_and_shipping_at_checkout' | t }}
+	</div>
+
+	<div class="mt-8 xl:mt-12">
+		<p class="uppercase text-center">{{ 'sections.cart.accepted_payment_methods' | t }}</p>
+		<ul class="flex
+					items-center
+					justify-center
+					mt-4">
+			<li class="h-14 w-20 bg-flash mx-1.5 flex items-center justify-center">
+				{%- render 'icon-visa' -%}
+			</li>
+			<li class="h-14 w-20 bg-flash mx-1.5 flex items-center justify-center">
+				{%- render 'icon-mastercard' -%}
+			</li>
+			<li class="h-14 w-20 bg-flash mx-1.5 flex items-center justify-center">
+				{%- render 'icon-shoppay' -%}
+			</li>
+			<li class="h-14 w-20 bg-flash mx-1.5 flex items-center justify-center">
+				{%- render 'icon-ax' -%}
+			</li>
+		</ul>
+	</div>
+</div>

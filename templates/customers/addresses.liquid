@@ -1,0 +1,354 @@
+<script src="{{ 'customer.js' | asset_url }}" defer></script>
+
+<div class="page-width">
+  	<div class="max-w-[90rem] mx-auto pt-10 xl:pt-14 pb-8 xl:pb-28">
+	  	<h1 class="text-2xl xl:text-5xl text-center mb-0">{{ 'customer.addresses.title' | t }}</h1>
+
+		{%- paginate customer.addresses by 20 -%}
+			<div class="mt-10 xl:mt-20" data-customer-addresses>
+
+				<ul class="flex flex-wrap" role="list">
+					{%- for address in customer.addresses -%}
+						<li class="p-4 w-full xl:w-1/3" data-address>
+							<div class="pt-6 xl:pt-10 pb-[10rem] px-8 xl:px-12 bg-flash h-full relative">
+								<h4>
+									{%- if address == customer.default_address -%}
+										{{ 'customer.account.default_address' | t }}
+									{%- else -%}
+										{{ 'customer.account.address' | t }} ({{ forloop.index }})
+									{%- endif -%}
+								</h4>
+
+								<div class="mt-6 text-lg">
+									{{ address | format_address }}
+								</div>
+
+								<div class="mt-8 
+                                      flex 
+                                      justify-between 
+                                      items-center
+                                      absolute
+                                      bottom-12
+                                      left-0
+                                      w-full
+                                      px-8
+                                      xl:px-12
+                                      z-10">
+									<button
+										class="btn btn--inverted btn--secondary flex-grow"
+										type="button"
+										aria-label="{{ 'customer.addresses.edit_address' | t }} {{ forloop.index }}"
+										data-id="EditAddress_{{ address.id }}"
+									>
+										{{ 'customer.addresses.edit_address' | t }}
+									</button>
+
+									<button
+										class="btn btn--inverted btn--secondary !p-2 h-[4.8rem] w-[4.8rem] !flex items-center justify-center ml-4"
+										type="button"
+										aria-label="{{ 'customer.addresses.delete' | t }} {{ forloop.index }}"
+										data-target="{{ address.url }}"
+										data-confirm-message="{{ 'customer.addresses.delete_confirm' | t }}"
+									>
+										{%- render 'icon-delete' -%}
+									</button>
+								</div>
+							</div>
+						</li>
+					{%- endfor -%}
+
+					<li class="w-full
+                        xl:w-1/3
+						p-4">
+						<div class="relative min-h-[8.2rem] xl:min-h-[20rem] w-full">
+							<button class="absolute
+								top-0
+								left-0
+								right-0
+								bottom-0
+								flex
+								flex-col
+								items-center
+								justify-center
+								w-full
+								h-full
+								border
+								border-silver2" type="button" data-id="AddAddress">
+								<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M6.99967 0.333008C7.36786 0.333008 7.66634 0.631485 7.66634 0.999674V6.33301H12.9997C13.3679 6.33301 13.6663 6.63148 13.6663 6.99967C13.6663 7.36786 13.3679 7.66634 12.9997 7.66634H7.66634V12.9997C7.66634 13.3679 7.36786 13.6663 6.99967 13.6663C6.63148 13.6663 6.33301 13.3679 6.33301 12.9997L6.33301 7.66634H0.999674C0.631485 7.66634 0.333008 7.36786 0.333008 6.99967C0.333008 6.63148 0.631485 6.33301 0.999674 6.33301H6.33301V0.999674C6.33301 0.631485 6.63148 0.333008 6.99967 0.333008Z" fill="#303030"/></svg>
+								<span class="font-bold text-lg tracking-normal mt-6 leading-none">{{ 'customer.addresses.add_new' | t }}</span>
+							</button>
+						</div>
+					</li>
+				</ul>
+
+				<ul class="mt-10">
+					<li id="AddAddress" data-address class="hidden edit-address-wrapper">
+						<h2 class="text-1xl xl:text-2xl mb-8">{{ 'customer.addresses.add_new' | t }}</h2>
+                      
+						{%- form 'customer_address', customer.new_address, aria-labelledBy: 'AddressNewHeading' -%}
+						<div class="field">
+							<input class="field__input" type="text" id="AddressFirstNameNew" name="address[first_name]" value="{{ form.first_name }}" autocomplete="given-name" placeholder="{{ 'customer.addresses.first_name' | t }}">
+							<label class="field__label" for="AddressFirstNameNew">{{ 'customer.addresses.first_name' | t }}</label>
+						</div>
+						<div class="field mt-4">
+							<input class="field__input" type="text" id="AddressLastNameNew" name="address[last_name]" value="{{ form.last_name }}" autocomplete="family-name" placeholder="{{ 'customer.addresses.last_name' | t }}">
+							<label class="field__label" for="AddressLastNameNew">{{ 'customer.addresses.last_name' | t }}</label>
+						</div>
+						<div class="field mt-4">
+							<input class="field__input" type="text" id="AddressCompanyNew" name="address[company]" value="{{ form.company }}" autocomplete="organization" placeholder="{{ 'customer.addresses.company' | t }}">
+							<label class="field__label" for="AddressCompanyNew">{{ 'customer.addresses.company' | t }}</label>
+						</div>
+						<div class="field mt-4">
+							<input class="field__input" type="text" id="AddressAddress1New" name="address[address1]" value="{{ form.address1 }}" autocomplete="address-line1" placeholder="{{ 'customer.addresses.address1' | t }}">
+							<label class="field__label" for="AddressAddress1New">{{ 'customer.addresses.address1' | t }}</label>
+						</div>
+						<div class="field mt-4">
+							<input class="field__input" type="text" id="AddressAddress2New" name="address[address2]" value="{{ form.address2 }}" autocomplete="address-line2" placeholder="{{ 'customer.addresses.address2' | t }}">
+							<label class="field__label" for="AddressAddress2New">{{ 'customer.addresses.address2' | t }}</label>
+						</div>
+						<div class="field mt-4">
+							<input class="field__input" type="text" id="AddressCityNew" name="address[city]" value="{{ form.city }}" autocomplete="address-level2" placeholder="{{ 'customer.addresses.city' | t }}">
+							<label class="field__label" for="AddressCityNew">{{ 'customer.addresses.city' | t }}</label>
+						</div>
+						<div class="mt-4">
+							
+							<div class="select field">
+								<select
+                                	class="field__input"
+									id="AddressCountryNew"
+									name="address[country]"
+									data-default="{{ form.country }}"
+									autocomplete="country"
+									placeholder="{{ 'customer.addresses.country' | t }}"
+								>
+								{{ all_country_option_tags }}
+								</select>
+                              	<label class="field__label" for="AddressCountryNew">{{ 'customer.addresses.country' | t }}</label>
+								<svg xmlns="http://www.w3.org/2000/svg" width="10" height="7" viewBox="0 0 10 7" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M9.85355 0.939354C9.65829 0.744092 9.34171 0.744092 9.14645 0.939354L5 5.0858L0.853554 0.939355C0.658291 0.744093 0.341709 0.744093 0.146446 0.939355C-0.0488155 1.13462 -0.0488155 1.4512 0.146446 1.64646L5 6.50001L9.85355 1.64646C10.0488 1.4512 10.0488 1.13462 9.85355 0.939354Z" fill="#303030"/></svg>
+							</div>
+						</div>
+						<div class="mt-4" id="AddressProvinceContainerNew" style="display: none">
+							<div class="select field">
+                              <select
+                                  class="field__input"
+                                  id="AddressProvinceNew"
+                                  name="address[province]"
+                                  data-default="{{ form.province }}"
+                                  autocomplete="address-level1"
+								  placeholder="{{ 'customer.addresses.province' | t }}"
+                              >
+                              </select>
+                              <label class="field__label" for="AddressProvinceNew">{{ 'customer.addresses.province' | t }}</label>
+                              <svg xmlns="http://www.w3.org/2000/svg" width="10" height="7" viewBox="0 0 10 7" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M9.85355 0.939354C9.65829 0.744092 9.34171 0.744092 9.14645 0.939354L5 5.0858L0.853554 0.939355C0.658291 0.744093 0.341709 0.744093 0.146446 0.939355C-0.0488155 1.13462 -0.0488155 1.4512 0.146446 1.64646L5 6.50001L9.85355 1.64646C10.0488 1.4512 10.0488 1.13462 9.85355 0.939354Z" fill="#303030"/></svg>
+							</div>
+						</div>
+						<div class="field mt-4">
+							<input class="field__input" type="text" id="AddressZipNew" name="address[zip]" value="{{ form.zip }}" autocapitalize="characters" autocomplete="postal-code" placeholder="{{ 'customer.addresses.zip' | t }}">
+							<label class="field__label" for="AddressZipNew">{{ 'customer.addresses.zip' | t }}</label>
+						</div> 
+						<div class="field mt-4">
+							<input class="field__input" type="tel" id="AddressPhoneNew" name="address[phone]" value="{{ form.phone }}" autocomplete="tel" placeholder="{{ 'customer.addresses.phone' | t }}">
+							<label class="field__label" for="AddressPhoneNew">{{ 'customer.addresses.phone' | t }}</label>
+						</div>
+						<div class="mt-4">
+                          	<label for="address_default_address_new" class="relative text-lg mb-6 flex items-center cursor-pointer ">
+                          		<input type="checkbox" 
+                                  class="absolute
+                                  overflow-hidden
+                                  w-0
+                                  h-0
+                                  -m-[-1px]
+                                  p-0
+                                  border-0
+                                  appearance-none
+                                  z-0"
+                                  value="1"
+                                  id="address_default_address_new"
+                                  name="address[default]">
+                              	<svg class="bg-white
+                                mr-5 icon-bg" width="1.6rem" height="1.6rem" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+                                  <rect width="16" height="16" stroke="currentColor" fill="none" stroke-width="1"></rect>
+                                </svg>
+                              	<svg class="icon 
+                                    icon-checkmark 
+                                    invisible 
+                                    absolute 
+                                    left-[0.3rem] 
+                                    z-10 
+                                    top-1/2
+                                    transform
+                                    -translate-y-1/2" width="1.1rem" height="0.7rem" viewBox="0 0 11 7" fill="none" xmlns="http://www.w3.org/2000/svg">
+
+                                    <path d="M1.5 3.5L2.83333 4.75L4.16667 6L9.5 1" stroke="#fff" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"></path>
+                                 </svg>
+                              	
+                              	 <span>{{ 'customer.addresses.set_default' | t }}</span>
+                          	</label>
+						</div>
+						<div class="mt-4">
+							<button class="btn w-full border border-transparent">{{ 'customer.addresses.add' | t }}</button>
+							<button class="btn w-full btn--inverted btn--secondary mt-4" type="reset" data-id="AddAddress">{{ 'customer.addresses.cancel' | t }}</button>
+						</div>
+						{%- endform -%}
+					</li>
+					{%- for address in customer.addresses -%}
+						<li id="EditAddress_{{ address.id }}" class="hidden edit-address-wrapper" data-address>
+                          <h2 class="text-1xl xl:text-2xl mb-8">{{ 'customer.addresses.edit_address' | t }}</h2>
+                          {%- form 'customer_address', address -%}
+                          <div class="field">
+                            <input class="field__input" type="text" id="AddressFirstName_{{ form.id }}" name="address[first_name]" value="{{ form.first_name }}" autocomplete="given-name" placeholder="{{ 'customer.addresses.first_name' | t }}">
+                            <label class="field__label" for="AddressFirstName_{{ form.id }}">{{ 'customer.addresses.first_name' | t }}</label>
+                          </div>
+                          <div class="field mt-4">
+                            <input class="field__input" type="text" id="AddressLastName_{{ form.id }}" name="address[last_name]" value="{{ form.last_name }}" autocomplete="family-name" placeholder="{{ 'customer.addresses.last_name' | t }}">
+                            <label class="field__label" for="AddressLastName_{{ form.id }}">{{ 'customer.addresses.last_name' | t }}</label>
+                          </div>
+                          <div class="field mt-4">
+                            <input class="field__input" type="text" id="AddressCompany_{{ form.id }}" name="address[company]" value="{{ form.company }}" autocomplete="organization" placeholder="{{ 'customer.addresses.company' | t }}">
+                            <label class="field__label" for="AddressCompany_{{ form.id }}">{{ 'customer.addresses.company' | t }}</label>
+                          </div>
+                          <div class="field mt-4">
+                            <input class="field__input" type="text" id="AddressAddress1_{{ form.id }}" name="address[address1]" value="{{ form.address1 }}" autocomplete="address-line1" placeholder="{{ 'customer.addresses.address1' | t }}">
+                            <label class="field__label" for="AddressAddress1_{{ form.id }}">{{ 'customer.addresses.address1' | t }}</label>
+                          </div>
+                          <div class="field mt-4">
+                            <input class="field__input" type="text" id="AddressAddress2_{{ form.id }}" name="address[address2]" value="{{ form.address2 }}" autocomplete="address-line2" placeholder="{{ 'customer.addresses.address2' | t }}">
+                            <label class="field__label" for="AddressAddress2_{{ form.id }}">{{ 'customer.addresses.address2' | t }}</label>
+                          </div>
+                          <div class="field mt-4">
+                            <input class="field__input" type="text" id="AddressCity_{{ form.id }}" name="address[city]" value="{{ form.city }}" autocomplete="address-level2" placeholder="{{ 'customer.addresses.city' | t }}">
+                            <label class="field__label" for="AddressCity_{{ form.id }}">{{ 'customer.addresses.city' | t }}</label>
+                          </div>
+                          <div class="mt-4">
+                            <div class="select field">
+                              <select
+                                      class="field__input"
+                                      id="AddressCountry_{{ form.id }}"
+                                      name="address[country]"
+                                      data-address-country-select
+                                      data-default="{{ form.country }}"
+                                      data-form-id="{{ form.id }}"
+                                      autocomplete="country"
+                                      >
+                                {{ all_country_option_tags }}
+                              </select>
+                              <label class="field__label" for="AddressCountry_{{ form.id }}">
+                                {{ 'customer.addresses.country' | t }}
+                              </label>
+                              <svg xmlns="http://www.w3.org/2000/svg" width="10" height="7" viewBox="0 0 10 7" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M9.85355 0.939354C9.65829 0.744092 9.34171 0.744092 9.14645 0.939354L5 5.0858L0.853554 0.939355C0.658291 0.744093 0.341709 0.744093 0.146446 0.939355C-0.0488155 1.13462 -0.0488155 1.4512 0.146446 1.64646L5 6.50001L9.85355 1.64646C10.0488 1.4512 10.0488 1.13462 9.85355 0.939354Z" fill="#303030"/></svg>
+                            </div>
+                          </div>
+                          <div class="mt-4" id="AddressProvinceContainer_{{ form.id }}" style="display:none;">
+                            
+                            <div class="select field">
+                              <select
+                                      class="field__input"
+                                      id="AddressProvince_{{ form.id }}"
+                                      name="address[province]"
+                                      data-default="{{ form.province }}"
+                                      autocomplete="address-level1"
+                                      >
+                              </select>
+                              <label class="field__label" for="AddressProvince_{{ form.id }}">
+                                {{ 'customer.addresses.province' | t }}
+                              </label>
+                              <svg xmlns="http://www.w3.org/2000/svg" width="10" height="7" viewBox="0 0 10 7" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M9.85355 0.939354C9.65829 0.744092 9.34171 0.744092 9.14645 0.939354L5 5.0858L0.853554 0.939355C0.658291 0.744093 0.341709 0.744093 0.146446 0.939355C-0.0488155 1.13462 -0.0488155 1.4512 0.146446 1.64646L5 6.50001L9.85355 1.64646C10.0488 1.4512 10.0488 1.13462 9.85355 0.939354Z" fill="#303030"/></svg>
+                            </div>
+                          </div>
+                          <div class="field mt-4">
+                            <input class="field__input" type="text" id="AddressZip_{{ form.id }}" name="address[zip]" value="{{ form.zip }}" autocapitalize="characters" autocomplete="postal-code" placeholder="{{ 'customer.addresses.zip' | t }}">
+                            <label class="field__label" for="AddressZip_{{ form.id }}">{{ 'customer.addresses.zip' | t }}</label>
+                          </div>
+                          <div class="field mt-4">
+                            <input class="field__input" type="tel" id="AddressPhone_{{ form.id }}"  name="address[phone]" value="{{ form.phone }}" autocomplete="tel" placeholder="{{ 'customer.addresses.phone' | t }}">
+                            <label class="field__label" for="AddressPhone_{{ form.id }}">{{ 'customer.addresses.phone' | t }}</label>
+                          </div>
+                          <div class="mt-4">
+                           <label for="address_default_address_{{ address.id }}" class="relative text-lg mb-6 flex items-center cursor-pointer ">
+                          		<input type="checkbox" 
+                                  class="absolute
+                                  overflow-hidden
+                                  w-0
+                                  h-0
+                                  -m-[-1px]
+                                  p-0
+                                  border-0
+                                  appearance-none
+                                  z-0"
+                                  value="1"
+                                  id="address_default_address_new"
+                                  name="address[default]">
+                              	<svg class="bg-white
+                                mr-5 icon-bg" width="1.6rem" height="1.6rem" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+                                  <rect width="16" height="16" stroke="currentColor" fill="none" stroke-width="1"></rect>
+                                </svg>
+                              	<svg class="icon 
+                                    icon-checkmark 
+                                    invisible 
+                                    absolute 
+                                    left-[0.3rem] 
+                                    z-10 
+                                    top-1/2
+                                    transform
+                                    -translate-y-1/2" width="1.1rem" height="0.7rem" viewBox="0 0 11 7" fill="none" xmlns="http://www.w3.org/2000/svg">
+
+                                    <path d="M1.5 3.5L2.83333 4.75L4.16667 6L9.5 1" stroke="#fff" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"></path>
+                                 </svg>
+                              	
+                              	 <span>{{ 'customer.addresses.set_default' | t }}</span>
+                          	</label>
+                          </div>
+                          <div class="mt-4">
+                            <button class="btn w-full border border-transparent">{{ 'customer.addresses.update' | t }}</button>
+                            <button class="btn w-full btn--inverted btn--secondary mt-4" type="reset" data-id="EditAddress_{{ address.id }}">{{ 'customer.addresses.cancel' | t }}</button>
+                          </div>
+                          {%- endform -%}
+						</li>
+					{%- endfor -%}
+				</ul>
+			</div>
+
+            {%- render 'pagination', paginate: paginate -%}
+		{%- endpaginate -%}
+
+		<div class="mt-8 xl:mt-12 flex justify-center items-center text-center">
+			<a href="{{ routes.account_url }}" class="flex justify-center items-center text-silver uppercase">
+				<svg xmlns="http://www.w3.org/2000/svg" width="5" height="8" viewBox="0 0 5 8" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M4.54549 0.359835C4.69194 0.506282 4.69194 0.743718 4.54549 0.890165L1.43566 4L4.54549 7.10983C4.69194 7.25628 4.69194 7.49372 4.54549 7.64017C4.39905 7.78661 4.16161 7.78661 4.01516 7.64017L0.375 4L4.01516 0.359835C4.16161 0.213388 4.39905 0.213388 4.54549 0.359835Z" fill="#7A7A7A"/></svg>
+				<span class="ml-5">{{ 'customer.account.return' | t }}</span>
+			</a>
+		</div>
+	</div>
+</div>
+
+<script>
+  window.onload = () => {
+    typeof CustomerAddresses !== 'undefined' && new CustomerAddresses();
+  }
+  
+  window.addEventListener('DOMContentLoaded', (event) => {
+    const toggle_btns = document.querySelectorAll('button[data-id]')
+    const edit_address_wrappers = document.querySelectorAll('.edit-address-wrapper')
+    if (toggle_btns) {
+      toggle_btns.forEach((toggle_btn) => {
+        toggle_btn.addEventListener('click', (event) => {
+            event.preventDefault()
+        	const id = event.target.closest('button').getAttribute('data-id')
+            const target = document.getElementById(id)
+            
+            edit_address_wrappers.forEach((edit_address_wrapper) => {
+				const edit_address_wrapper_id = edit_address_wrapper.id
+				if (edit_address_wrapper_id !== id) edit_address_wrapper.classList.add('hidden')
+			})
+            
+            if (target) {
+              if (target.classList.contains('hidden')) {
+                target.classList.remove('hidden')
+              } else {
+                target.classList.add('hidden')
+              }
+            }
+         })
+      })
+    }
+  })
+</script>

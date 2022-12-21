@@ -1,0 +1,46 @@
+{%- liquid
+    assign space_desktop = section.settings.space_desktop | default: 0
+    assign space_mobile = section.settings.space_mobile | default: 0
+-%}
+
+<div id="space-{{ section.id }}"></div>
+
+<style>
+    #space-{{ section.id }} {
+        height: 0;
+        padding-top: {{ space_mobile }}rem;
+    }
+
+    @media only screen and (min-width: 1280px) {
+        #space-{{ section.id }} {
+            padding-top: {{ space_desktop }}rem;
+        }
+    }
+</style>
+
+{% schema %}
+{
+  "name": "Spacer",
+  "settings": [
+	{
+      "type": "number",
+      "id": "space_desktop",
+      "label": "Space desktop (rem)",
+      "default": 0,
+      "info": "1rem = 10px"
+    },
+    {
+      "type": "number",
+      "id": "space_mobile",
+      "label": "Space mobile (rem)",
+      "default": 0,
+      "info": "1rem = 10px"
+    }
+  ],
+  "presets":[
+    {
+    	"name": "Spacer"
+    }
+  ]
+}
+{% endschema %}

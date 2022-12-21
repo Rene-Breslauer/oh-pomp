@@ -1,0 +1,509 @@
+<script src="{{ 'cart.js' | asset_url }}" defer="defer"></script>
+
+<div class="page-width">
+
+  <div class="xl:grid
+    xl:grid-cols-cart
+    xl:gap-20
+    xl:justify-between
+	  mt-10
+    xl:mt-14
+    relative
+    cart-wrapper">
+
+    <cart-items class="
+        {% unless cart.item_count > 0 %}
+            is-empty
+        {% endunless %}">
+      <h1 class="text-2xl xl:text-5xl text-center xl:text-left">{{ 'sections.cart.title' | t }}</h1>
+      <div class="cart-items__main">
+        <div class="mt-8">
+          <form action="{{ routes.cart_url }}" method="post" id="cart">
+            <div id="main-cart-items" data-id="{{ section.id }}">
+              <div class="js-contents">
+                {%- if cart != empty -%}
+                  <table class="w-full">
+                    <thead class="border-b border-silver2 hidden xl:table-header-group	">
+                    <tr>
+                      <th class="text-sm font-normal uppercase text-silver py-6 text-left w-full xl:w-2/3" scope="col">{{ 'sections.cart.headings.product' | t }}</th>
+                      <th class="text-sm font-normal uppercase text-silver py-6 px-8" colspan="1" scope="col">{{ 'sections.cart.headings.price' | t }}</th>
+                      <th class="text-sm font-normal uppercase text-silver py-6 px-8" colspan="1" scope="col">{{ 'sections.cart.headings.quantity' | t }}</th>
+                      <th class="text-sm font-normal uppercase text-silver py-6 text-right pl-8" colspan="1" scope="col">{{ 'sections.cart.headings.total' | t }}</th>
+                    </tr>
+                    </thead>
+
+                    <tbody>
+                    {%- for item in cart.items -%}
+                      <tr class="border-b border-flash" id="CartItem-{{ item.index | plus: 1 }}">
+                        <td class="py-8 align-top">
+                          <div class="flex xl:pt-[1.2rem]">
+                            <div class="w-[10rem] xl:w-[20rem] min-h-[14.5rem] xl:min-w-[20rem] mr-8 xl:mr-12">
+                              {% if item.image %}
+                                <a href="{{ item.url }}" class="block relative h-[14.5rem] xl:h-[29rem] min-w-[10rem] xl:min-w-[20rem]" aria-hidden="true" tabindex="-1">
+                                  {%- render 'img', image: item.image -%}
+                                </a>
+                              {% endif %}
+                            </div>
+
+                            <div class="relative pr-28 xl:pr-0 pb-12 w-full xl:w-auto">
+                              <div class="absolute right-0 top-[.4rem] z-10 xl:hidden">
+                                {%- if item.original_line_price != item.final_line_price -%}
+                                  <dl class="flex flex-col xl:flex-row justify-end xl:justify-center items-end xl:items-center">
+                                    <dt class="visually-hidden">
+                                      {{ 'products.product.price.regular_price' | t }}
+                                    </dt>
+                                    <dd class="inline m-0">
+                                      <s class="text-silver">
+                                        {{ item.original_line_price | money }}
+                                      </s>
+                                    </dd>
+                                    <dt class="visually-hidden">
+                                      {{ 'products.product.price.sale_price' | t }}
+                                    </dt>
+                                    <dd class="inline m-0 font-bold">
+                                      {{ item.final_line_price | money }}
+                                    </dd>
+                                  </dl>
+                                {%- else -%}
+                                  <p class="flex justify-center items-center">
+                                    {{ item.original_line_price | money }}
+                                  </p>
+                                {%- endif -%}
+
+                                {%- if item.variant.available and item.unit_price_measurement -%}
+                                  <div class="flex justify-center items-center">
+                                    <span class="visually-hidden">{{ 'products.product.price.unit_price' | t }}</span>
+                                    {{ item.variant.unit_price | money }}
+                                    <span aria-hidden="true">/</span>
+                                    <span class="visually-hidden">&nbsp;{{ 'accessibility.unit_price_separator' | t }}&nbsp;</span>
+                                    {%- if item.variant.unit_price_measurement.reference_value != 1 -%}
+                                      {{- item.variant.unit_price_measurement.reference_value -}}
+                                    {%- endif -%}
+                                    {{ item.variant.unit_price_measurement.reference_unit }}
+                                  </div>
+                                {%- endif -%}
+                              </div>
+
+                              <h4 class="flex items-center max-w-[90%] xl:max-w-full">
+                                <a href="{{ item.url }}">{{ item.product.title | escape }}</a>
+                              </h4>
+
+                              {%- if item.product.has_only_default_variant == false or item.properties.size != 0 or item.selling_plan_allocation != nil -%}
+                                <dl class="uppercase mt-4 xl:mt-5">
+                                  {%- if item.product.has_only_default_variant == false -%}
+                                    {%- for option in item.options_with_values -%}
+                                      <div class="py-1 xl:py-1.5">
+                                        <dt class="m-0 inline">{{ option.name }}: </dt>
+                                        <dd class="m-0 inline">{{ option.value }}</dd>
+                                      </div>
+                                    {%- endfor -%}
+                                  {%- endif -%}
+
+                                  {%- for property in item.properties -%}
+                                    {%- assign property_first_char = property.first | slice: 0 -%}
+                                    {%- if property.last != blank and property_first_char != '_' -%}
+                                      <div class="py-1 xl:py-1.5">
+                                        <dt class="m-0 inline">{{ property.first }}: </dt>
+                                        <dd class="m-0 inline">
+                                          {%- if property.last contains '/uploads/' -%}
+                                            <a href="{{ property.last }}" target="_blank">
+                                              {{ property.last | split: '/' | last }}
+                                            </a>
+                                          {%- else -%}
+                                            {{ property.last }}
+                                          {%- endif -%}
+                                        </dd>
+                                      </div>
+                                    {%- endif -%}
+                                  {%- endfor -%}
+                                </dl>
+
+                                <p class="py-1 xl:py-1.5">{{ item.selling_plan_allocation.selling_plan.name }}</p>
+                              {%- endif -%}
+
+                              {%- if item.discounts.size > 0 -%}
+                                <ul class="uppercase mt-4 xl:mt-5" role="list" aria-label="{{ 'customer.order.discount' | t }}">
+                                  {%- for discount in item.discounts -%}
+                                    <li class="py-1 xl:py-1.5">
+                                      {{ discount.title }}
+                                    </li>
+                                  {%- endfor -%}
+                                </ul>
+                              {%- endif -%}
+
+                              <cart-remove-button class="absolute
+                                                                    left-0
+                                                                    bottom-[1.1rem]
+                                                                    xl:bottom-6" id="Remove-{{ item.index | plus: 1 }}" data-index="{{ item.index | plus: 1 }}">
+                                <a href="{{ item.url_to_remove }}" data-vid={{item.variant_id}} class="cart__remove flex items-center uppercase text-silver text-sm leading-none" aria-label="{{ 'sections.cart.remove_title' | t: title: item.title }}">
+                                {%- render 'icon-remove' -%}
+                                <span class="ml-3">{{ 'sections.cart.remove' | t }}</span>
+                                </a>
+                              </cart-remove-button>
+
+                              <quantity-input class="absolute right-0 bottom-0 block w-[9.4rem] xl:hidden">
+                                <button class="absolute
+                                                                        z-10
+                                                                        no-js-hidden
+                                                                        top-0
+                                                                        h-full
+                                                                        w-[3.2rem]
+                                                                        flex
+                                                                        items-center
+                                                                        justify-center" name="minus" type="button">
+                                  <span class="visually-hidden">{{ 'products.product.quantity.decrease' | t: product: item.product.title | escape }}</span>
+                                  {% render 'icon-minus' %}
+                                </button>
+                                <input class="w-full
+                                                                        border
+                                                                        rounded-none
+                                                                        border-silver2
+                                                                        text-center
+                                                                        p-4
+                                                                        h-[3.2rem]
+                                                                        leading-none
+                                                                        appearance-none"
+                                       type="number"
+                                       name="updates[]"
+                                       value="{{ item.quantity }}"
+                                       min="0"
+                                       aria-label="{{ 'products.product.quantity.input_label' | t: product: item.product.title | escape }}"
+                                       id="Quantity-{{ item.index | plus: 1 }}"
+                                       data-index="{{ item.index | plus: 1 }}"
+                                >
+                                <button class="absolute
+                                                                        z-10
+                                                                        no-js-hidden
+                                                                        top-0
+                                                                        right-0
+                                                                        h-full
+                                                                        w-[3.2rem]
+                                                                        flex
+                                                                        items-center
+                                                                        justify-center" name="plus" type="button">
+                                  <span class="visually-hidden">{{ 'products.product.quantity.increase' | t: product: item.product.title | escape }}</span>
+                                  {% render 'icon-plus' %}
+                                </button>
+                              </quantity-input>
+                            </div>
+                          </div>
+                        </td>
+
+                        <td class="py-8 text-lg px-8 align-top text-center hidden xl:table-cell">
+                          <div class="loading-overlay hidden">
+                            <div class="loading-overlay__spinner">
+                              <svg aria-hidden="true" focusable="false" role="presentation" class="spinner" viewBox="0 0 66 66" xmlns="http://www.w3.org/2000/svg"><circle class="path" fill="none" stroke-width="6" cx="33" cy="33" r="30"></circle>
+                              </svg>
+                            </div>
+                          </div>
+                          <div class="xl:pt-[1.2rem]">
+                            {%- if item.original_line_price != item.final_line_price -%}
+                              <dl class="flex justify-center items-center">
+                                <dt class="visually-hidden">
+                                  {{ 'products.product.price.regular_price' | t }}
+                                </dt>
+                                <dd class="inline m-0">
+                                  <s class="text-silver">
+                                    {{ item.original_line_price | money }}
+                                  </s>
+                                </dd>
+                                <dt class="visually-hidden">
+                                  {{ 'products.product.price.sale_price' | t }}
+                                </dt>
+                                <dd class="inline m-0">
+                                  {{ item.final_line_price | money }}
+                                </dd>
+                              </dl>
+                            {%- else -%}
+                              <p class="flex justify-center items-center">
+                                {{ item.original_line_price | money }}
+                              </p>
+                            {%- endif -%}
+
+                            {%- if item.variant.available and item.unit_price_measurement -%}
+                              <div class="flex justify-center items-center">
+                                <span class="visually-hidden">{{ 'products.product.price.unit_price' | t }}</span>
+                                {{ item.variant.unit_price | money }}
+                                <span aria-hidden="true">/</span>
+                                <span class="visually-hidden">&nbsp;{{ 'accessibility.unit_price_separator' | t }}&nbsp;</span>
+                                {%- if item.variant.unit_price_measurement.reference_value != 1 -%}
+                                  {{- item.variant.unit_price_measurement.reference_value -}}
+                                {%- endif -%}
+                                {{ item.variant.unit_price_measurement.reference_unit }}
+                              </div>
+                            {%- endif -%}
+                          </div>
+                        </td>
+
+                        <td class="py-8 text-lg px-8 align-top text-center hidden xl:table-cell">
+                          <div class="flex justify-center">
+                            <quantity-input class="relative block w-[11.8rem]">
+                              <button class="absolute
+                                                                    z-10
+                                                                    no-js-hidden
+                                                                    top-0
+                                                                    h-full
+                                                                    w-[4.8rem]
+                                                                    flex
+                                                                    items-center
+                                                                    justify-center" name="minus" type="button">
+                                <span class="visually-hidden">{{ 'products.product.quantity.decrease' | t: product: item.product.title | escape }}</span>
+                                {% render 'icon-minus' %}
+                              </button>
+                              <input class="w-full
+                                                                    border
+                                                                    rounded-none
+                                                                    border-silver2
+                                                                    text-center
+                                                                    p-4
+                                                                    h-[4.8rem]
+                                                                    leading-none
+                                                                    appearance-none"
+                                     type="number"
+                                     name="updates[]"
+                                     value="{{ item.quantity }}"
+                                     min="0"
+                                     aria-label="{{ 'products.product.quantity.input_label' | t: product: item.product.title | escape }}"
+                                     id="Quantity-{{ item.index | plus: 1 }}"
+                                     data-index="{{ item.index | plus: 1 }}"
+                              >
+                              <button class="absolute
+                                                                    z-10
+                                                                    no-js-hidden
+                                                                    top-0
+                                                                    right-0
+                                                                    h-full
+                                                                    w-[4.8rem]
+                                                                    flex
+                                                                    items-center
+                                                                    justify-center" name="plus" type="button">
+                                <span class="visually-hidden">{{ 'products.product.quantity.increase' | t: product: item.product.title | escape }}</span>
+                                {% render 'icon-plus' %}
+                              </button>
+                            </quantity-input>
+
+                          </div>
+
+                          <div class="mt-4" id="Line-item-error-{{ item.index | plus: 1 }}" role="alert">
+                            <small class="text-sm"></small>
+                          </div>
+                        </td>
+
+                        <td class="py-8 text-lg align-top text-right pl-8 hidden xl:table-cell">
+                          <div class="loading-overlay hidden">
+                            <div class="loading-overlay__spinner">
+                              <svg aria-hidden="true" focusable="false" role="presentation" class="spinner" viewBox="0 0 66 66" xmlns="http://www.w3.org/2000/svg">
+                                <circle class="path" fill="none" stroke-width="6" cx="33" cy="33" r="30"></circle>
+                              </svg>
+                            </div>
+                          </div>
+
+                          <div class="xl:pt-[1.2rem]">
+                            {%- if item.original_line_price != item.final_line_price -%}
+                              <dl class="flex justify-end items-center">
+                                <dt class="visually-hidden">
+                                  {{ 'products.product.price.regular_price' | t }}
+                                </dt>
+                                <dd class="inline m-0">
+                                  <s class="text-silver">
+                                    {{ item.original_line_price | money }}
+                                  </s>
+                                </dd>
+                                <dt class="visually-hidden">
+                                  {{ 'products.product.price.sale_price' | t }}
+                                </dt>
+                                <dd class="inline m-0">
+                                  {{ item.final_line_price | money }}
+                                </dd>
+                              </dl>
+                            {%- else -%}
+                              <span class="flex justify-end items-center">
+                                                                    {{ item.original_line_price | money }}
+                                                                </span>
+                            {%- endif -%}
+
+                            {%- if item.variant.available and item.unit_price_measurement -%}
+                              <div class="flex justify-end items-center">
+                                <span class="visually-hidden">{{ 'products.product.price.unit_price' | t }}</span>
+                                {{ item.variant.unit_price | money }}
+                                <span aria-hidden="true">/</span>
+                                <span class="visually-hidden">&nbsp;{{ 'accessibility.unit_price_separator' | t }}&nbsp;</span>
+                                {%- if item.variant.unit_price_measurement.reference_value != 1 -%}
+                                  {{- item.variant.unit_price_measurement.reference_value -}}
+                                {%- endif -%}
+                                {{ item.variant.unit_price_measurement.reference_unit }}
+                              </div>
+                            {%- endif -%}
+                          </div>
+                        </td>
+                      </tr>
+                    {%- endfor -%}
+                    </tbody>
+                  </table>
+                {%- endif -%}
+              </div>
+            </div>
+
+            <p class="visually-hidden" id="cart-live-region-text" aria-live="polite" role="status"></p>
+            <p class="visually-hidden" id="shopping-cart-line-item-status" aria-live="polite" aria-hidden="true" role="status">{{ 'accessibility.loading' | t }}</p>
+          </form>
+        </div>
+      </div>
+
+      <div class="cart-items__empty">
+        <h4 class="mt-10 uppercase">{{ 'sections.cart.empty' | t }}</h4>
+        <div class="mt-8 mb-12">
+          <a href="{{ routes.all_products_collection_url }}" class="btn">{{ 'sections.cart.continue_shopping' | t }}</a>
+        </div>
+      </div>
+    </cart-items>
+
+    <div id="cart-totals" class="h-max mb-8 xl:mb-0">
+      <div class="pt-6 pb-8 xl:py-12 px-8 xl:px-16 border border-silver2">
+        <div class="flex items-center justify-between pb-8 xl:pb-10 border-b border-silver2">
+          <h2 class="text-1xl xl:text-3xl tracking-normal normal-case mb-0">{{ 'sections.cart.totals_title' | t }}</h2>
+
+          <p class="uppercase text-silver">
+            {{ cart.item_count }}
+            {%- if cart.item_count == 1 -%}
+              {{ 'sections.cart.totals_item' | t }}
+            {%- else -%}
+              {{ 'sections.cart.totals_items' | t }}
+            {%- endif -%}
+          </p>
+        </div>
+
+        {% if settings.cart_promo_type == 'freeshipping' %}
+          {% render 'freeshipping-bar' %}
+        {% else %}
+          {% render 'discounts-bar' %}
+        {% endif %}
+
+        {% if cart.total_discount > 0 %}
+          <div class="flex items-center justify-between py-8 xl:py-10 border-b border-flash">
+            <h4>Total</h4>
+            <p class="text-lg font-bold tracking-normal">{{ cart.original_total_price | money }}</p>
+          </div>
+          <div class="flex flex-wrap items-center justify-between py-8 xl:py-10 border-b border-flash">
+            <h4>Discount</h4>
+            <p class="text-lg font-bold tracking-normal">{{ cart.total_discount | money }}</p>
+
+            <div class="grid w-full">
+            {%- if cart.cart_level_discount_applications.size > 0 -%}
+              <ul class="text-right" role="list" aria-label="{{ 'customer.order.discount' | t }}">
+                {%- for discount in cart.cart_level_discount_applications -%}
+                  <li class="{% unless forloop.last %}mb-3{% endunless %}">
+                    {{ discount.title }}
+                  </li>
+                {%- endfor -%}
+              </ul>
+            {%- endif -%}
+            </div>
+          </div>
+        {% endif %}
+
+        <div class="flex items-center justify-between py-8 xl:py-10 border-b border-flash">
+          <h4>{{ 'sections.cart.totals_subtotal' | t }}</h4>
+          <p class="text-lg font-bold tracking-normal" {% if cart.total_discount > 0 %}style="color:#D44040"{% endif %}>{{ cart.total_price | money }}</p>
+        </div>
+
+        {% comment %}
+        {%- if cart.cart_level_discount_applications.size > 0 -%}
+          <div class="flex justify-between py-8 xl:py-10 border-b border-flash">
+            <h4>{{ 'sections.cart.totals_discounts' | t }}</h4>
+            <ul class="text-right" role="list" aria-label="{{ 'customer.order.discount' | t }}">
+              {%- for discount in cart.cart_level_discount_applications -%}
+                <li class="{% unless forloop.last %}mb-3{% endunless %}">
+                  {{ discount.title }}
+                  (-{{ discount.total_allocated_amount | money }})
+                </li>
+              {%- endfor -%}
+            </ul>
+          </div>
+        {%- endif -%}
+        {% endcomment %}
+
+        <div class="flex items-center justify-center py-8 xl:py-10">
+          {%- form 'cart', cart -%}
+            {{ form | payment_terms }}
+          {%- endform -%}
+        </div>
+
+        <div>
+          <button type="submit" id="checkout" class="btn w-full !flex items-center justify-center border border-transparent" name="checkout"{% if cart == empty %} disabled{% endif %} form="cart">
+            {%- render 'icon-shield' -%}
+            <span class="ml-3">{{ 'sections.cart.checkout' | t }}</span>
+          </button>
+
+          <a href="/collections/all" class="btn btn--inverted btn--secondary w-full mt-4">
+            {{ 'sections.cart.continue_shopping' | t }}
+          </a>
+        </div>
+
+        <div class="flex items-center justify-center pt-8 xl:pt-10 text-center text-lg">
+          {{ 'sections.cart.taxes_and_shipping_at_checkout' | t }}
+        </div>
+
+        <div class="mt-8 xl:mt-12">
+          <p class="uppercase text-center">{{ 'sections.cart.accepted_payment_methods' | t }}</p>
+          <ul class="flex
+            items-center
+            justify-center
+            mt-4">
+            <li class="h-14 w-20 bg-flash mx-1.5 flex items-center justify-center">
+              {%- render 'icon-visa' -%}
+            </li>
+            <li class="h-14 w-20 bg-flash mx-1.5 flex items-center justify-center">
+              {%- render 'icon-mastercard' -%}
+            </li>
+            <li class="h-14 w-20 bg-flash mx-1.5 flex items-center justify-center">
+              {%- render 'icon-shoppay' -%}
+            </li>
+            <li class="h-14 w-20 bg-flash mx-1.5 flex items-center justify-center">
+              {%- render 'icon-ax' -%}
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const cartTotals = document.getElementById('cart-totals')
+        const cartItems = document.querySelector('cart-items')
+        const cartWrapper = document.querySelector('.cart-wrapper')
+        if (cartTotals && cartItems) {
+            const cartWrapperPos = cartWrapper.offsetTop
+            const cartTotalsHeight = cartTotals.offsetHeight
+            const cartWrapperEnd = cartWrapperPos + cartWrapper.offsetHeight
+            const cartTotalsScrollEnd = cartWrapperEnd - cartTotalsHeight
+            document.addEventListener('scroll', function(e) {
+                if (window.scrollY >= cartWrapperPos - 50) {
+                    cartTotals.classList.add('cart-totals--sticky')
+                    let scroll_top =  window.scrollY - cartWrapperPos + 50
+                    let scroll_end = (window.scrollY + cartTotalsHeight) >= cartWrapperEnd
+
+                    //console.log(cartTotalsHeight)
+
+                    if (!scroll_end) {
+                        cartTotals.style.top = `${scroll_top}px`
+                    }
+                } else {
+                    cartTotals.classList.remove('cart-totals--sticky')
+                }
+            })
+        }
+    })
+</script>
+
+{% schema %}
+{
+  "name": "t:sections.main-cart-items.name",
+  "settings": [
+  ]
+}
+{% endschema %}

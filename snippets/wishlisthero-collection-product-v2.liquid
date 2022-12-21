@@ -1,0 +1,9 @@
+<div class="wishlist-hero-custom-button wishlisthero-floating"
+style="left: auto;" data-wlh-id="{{product.id}}"
+data-wlh-link="https://{{shop.domain}}{{product.url}}"
+data-wlh-variantid="{{product.selected_or_first_available_variant.id}}"
+data-wlh-price="{{product.selected_or_first_available_variant.price | 
+remove: '.' | remove: ',' | divided_by: 100.0 }}" 
+data-wlh-name="{{product.title | strip_html }}"
+data-wlh-image="{{product.featured_image | img_url: '1024x'}}"
+data-wlh-mode="icon_only"></div>

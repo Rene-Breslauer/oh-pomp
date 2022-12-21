@@ -1,0 +1,18 @@
+{%- render 'icon-cart' -%}
+{%- if cart != empty -%}
+    <div class="hidden xl:block cart-count-bubble ml-4">
+        <span class="uppercase text-sm">{{ 'sections.header.cart_count' | t: count: cart.item_count }}</span>
+    </div>
+    <div class="xl:hidden 
+        absolute 
+        top-0 
+        right-0 
+        h-4
+        w-4
+        border-2
+        border-white
+        rounded-full
+        bg-jasper
+        z-[1]
+        "></div>
+{%- endif -%}

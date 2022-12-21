@@ -1,0 +1,31 @@
+{% comment %}
+    Renders cart notification
+
+    Accepts:
+    - color_scheme: {String} sets the color scheme of the notification (optional)
+
+    Usage:
+    {% render 'cart-notification' %}
+{% endcomment %}
+
+{{ 'mini-cart.css' | asset_url | stylesheet_tag }}
+
+<cart-notification>
+  <div class="relative page-width">
+    <div id="cart-notification" class="fixed
+              top-0
+              right-0
+
+              w-full
+              invisible
+              transform
+              -translate-y-full
+              bg-white
+              py-10
+
+              border-2
+              border-primary" aria-modal="true" aria-label="{{ 'general.cart.item_added' | t }}" role="dialog" tabindex="-1">
+      <div id="cart-mini-body" data-id="{{ section.id }}"></div>
+    </div>
+  </div>
+</cart-notification>

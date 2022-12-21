@@ -1,0 +1,192 @@
+<div class="relative 
+  xl:h-screen
+  min-h-[75vh]
+  bg-flash
+  xl:bg-transparent
+  flex
+  items-center
+  justify-center
+  xl:justify-end">
+  
+  <div class="hidden px-8 xl:px-0 w-full max-w-[38rem] xl:mr-[19%] toggle-block" id="recover" tabindex="-1">
+    <h1 class="text-5xl text-center">
+      {{ 'customer.recover_password.title' | t }}
+    </h1>
+
+    <p class="text-lg mt-5 tracking-normal text-center">
+      {{ 'customer.recover_password.subtext' | t }}
+    </p>
+
+    <div class="mt-9 xl:mt-16">
+      {%- form 'recover_customer_password' -%}
+        {% assign recover_success = form.posted_successfully? %}
+      	{%- if form.errors -%}
+          <div class="px-6 py-4 border border-primary mb-4" tabindex="-1" autofocus>
+            {{ form.errors.messages['form'] }}
+          </div>
+        {%- endif -%}
+            
+        <div class="field">
+          <input type="email"
+            class="field__input"
+            value=""
+            name="email"
+            id="RecoverEmail"
+            autocorrect="off"
+            autocapitalize="off"
+            autocomplete="email"
+            {% if form.errors %}
+              aria-invalid="true"
+              aria-describedby="RecoverEmail-email-error"
+              autofocus
+            {% endif %}
+            placeholder="{{ 'customer.login_page.email' | t }}"
+          >
+          <label class="field__label" for="RecoverEmail">
+            {{ 'customer.login_page.email' | t }}
+          </label>
+        </div>
+
+        <button class="mt-4 btn w-full">
+          {{ 'customer.login_page.reset' | t }}
+        </button>
+
+        <p class="mt-12 text-silver text-center uppercase">
+          {{ 'customer.recover_password.remember' | t }} <a class="text-primary underline toggle-login-recover" href="#login">{{ 'customer.login_page.sign_in' | t }}</a>
+        </p>
+      {%- endform -%}
+    </div>
+  </div>
+
+  <div class="w-full px-8 xl:px-0 max-w-[38rem] xl:mr-[19%] toggle-block" id="login" tabindex="-1">
+    <h1 class="text-5xl text-center">
+      {{ 'customer.login_page.sign_in' | t }}
+    </h1>
+
+    <p class="text-lg mt-5 tracking-normal text-center">{{ 'customer.login_page.subtitle' | t }}</p>
+
+    <div class="mt-9 xl:mt-16">
+      {%- if recover_success == true -%}
+        <div class="px-6 py-4 border border-primary mb-4" tabindex="-1" autofocus>
+          {{ 'customer.recover_password.success' | t }}
+        </div>
+      {%- endif -%}
+      {%- form 'customer_login', novalidate: 'novalidate' -%}
+        {%- if form.errors -%}
+          <div class="px-6 py-4 border border-primary mb-4" tabindex="-1" autofocus>
+          	{{ form.errors | default_errors }}
+          </div>
+        {%- endif -%}
+
+        <div class="field">        
+          <input
+            class="field__input"
+            type="email"
+            name="customer[email]"
+            id="CustomerEmail"
+            autocomplete="email"
+            autocorrect="off"
+            autocapitalize="off"
+            {% if form.errors contains 'form' %}
+              aria-invalid="true"
+            {% endif %}
+            placeholder="{{ 'customer.login_page.email' | t }}"
+          >
+          <label class="field__label" for="CustomerEmail">
+            {{ 'customer.login_page.email' | t }}
+          </label>
+        </div>
+
+        {%- if form.password_needed -%}
+          <div class="mt-4 field">          
+            <input
+              class="field__input"
+              type="password"
+              value=""
+              name="customer[password]"
+              id="CustomerPassword"
+              autocomplete="current-password"
+              {% if form.errors contains 'form' %}
+                aria-invalid="true"
+              {% endif %}
+              placeholder="{{ 'customer.login_page.password' | t }}"
+            >
+            <label class="field__label" for="CustomerPassword">
+              {{ 'customer.login_page.password' | t }}
+            </label>
+
+            <a class="absolute
+              top-1/2
+              transform
+              -translate-y-1/2
+              text-lg
+              leading-none
+              right-8
+              tracking-normal
+              toggle-login-recover" href="#recover">
+              {{ 'customer.login_page.forgot_password' | t }}
+            </a>
+          </div>
+        {%- endif -%}
+
+        <button class="mt-4 btn w-full">
+          {{ 'customer.login_page.sign_in' | t }}
+        </button>
+
+        <p class="mt-12 text-silver text-center uppercase">
+          {{ 'customer.login_page.create_account_pretext' | t }} <a class="text-primary underline" href="{{ routes.account_register_url }}">{{ 'customer.login_page.create_account' | t }}</a>
+        </p>
+      {%- endform -%}
+    </div>
+  </div>
+
+  {%- if settings.account_image -%}
+    <div class="hidden xl:block">
+      	{%- render 'img', image: settings.account_image -%}
+    </div>
+  {%- endif -%}
+</div>
+
+
+<script>
+  window.addEventListener('DOMContentLoaded', (event) => {
+    const toggle_elems = document.querySelectorAll('.toggle-login-recover');
+
+    for (const toggle_elem of toggle_elems) {
+      toggle_elem.addEventListener('click', toggle);
+    }
+
+    window.toggle_blocks = document.querySelectorAll('.toggle-block');
+
+    function toggle(e) {
+      e.preventDefault();
+
+      for (const toggle_block of toggle_blocks) {
+        toggle_block.classList.add('hidden');
+      }
+
+      const target = this.getAttribute('href');
+      document.querySelector(target).classList.remove('hidden');
+    }
+
+    if (window.location.href.includes('recover')) {
+      for (const toggle_block of toggle_blocks) {
+        toggle_block.classList.add('hidden');
+      }
+
+      document.getElementById('recover').classList.remove('hidden');
+    }
+  })
+</script>
+
+{%- if recover_success == true -%}
+  <script>
+    window.addEventListener('DOMContentLoaded', (event) => {
+      for (const toggle_block of toggle_blocks) {
+        toggle_block.classList.add('hidden');
+      }
+
+      document.getElementById('recover').classList.remove('hidden');
+    })
+  </script>
+{%- endif -%}

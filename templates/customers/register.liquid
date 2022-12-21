@@ -1,0 +1,123 @@
+<div class="relative 
+  xl:h-screen 
+  min-h-[75vh]
+  bg-flash
+  xl:bg-transparent
+  flex
+  items-center
+  justify-center
+  xl:justify-end">
+
+  <div class="px-8 xl:px-0 w-full max-w-[38rem] xl:mr-[19%]">
+    <h1 class="text-5xl text-center">
+      {{ 'customer.register.title' | t }}
+    </h1>
+
+    <p class="text-lg mt-5 tracking-normal text-center">
+      {{ 'customer.register.subtext' | t }}
+    </p>
+
+    <div class="mt-16">
+      {%- form 'create_customer', novalidate: 'novalidate' -%}
+        {%- if form.errors -%}
+            <div class="px-6 py-4 border border-primary mb-4" tabindex="-1" autofocus>
+                <ul> 
+                    {%- for field in form.errors -%}
+                        <li>
+                            {%- if field == 'form' -%}
+                                {{ form.errors.messages[field] }}
+                            {%- else -%}
+                                {{ form.errors.translated_fields[field] | capitalize }}
+                                {{ form.errors.messages[field] }}
+                            {%- endif -%}
+                        </li>
+                    {%- endfor -%}
+                </ul>
+            </div>
+        {%- endif -%}
+
+        <div class="field">      
+          <input
+            class="field__input"
+            type="text"
+            name="customer[first_name]"
+            id="RegisterForm-FirstName"
+            {% if form.first_name %}value="{{ form.first_name }}"{% endif %}
+            autocomplete="given-name"
+            placeholder="{{ 'customer.register.first_name' | t }}"
+          >
+          <label class="field__label" for="RegisterForm-FirstName">
+            {{ 'customer.register.first_name' | t }}
+          </label>
+        </div>
+        <div class="field mt-4">
+          <input
+            class="field__input"
+            type="text"
+            name="customer[last_name]"
+            id="RegisterForm-LastName"
+            {% if form.last_name %}value="{{ form.last_name }}"{% endif %}
+            autocomplete="family-name"
+            placeholder="{{ 'customer.register.last_name' | t }}"
+          >
+          <label class="field__label" for="RegisterForm-LastName">
+            {{ 'customer.register.last_name' | t }}
+          </label>
+        </div>
+        <div class="field mt-4">      
+          <input
+            class="field__input"
+            type="email"
+            name="customer[email]"
+            id="RegisterForm-email"
+            {% if form.email %} value="{{ form.email }}"{% endif %}
+            spellcheck="false"
+            autocapitalize="off"
+            autocomplete="email"
+            aria-required="true"
+            {% if form.errors contains 'email' %}
+              aria-invalid="true"
+              aria-describedby="RegisterForm-email-error"
+            {% endif %}
+            placeholder="{{ 'customer.register.email' | t }}"
+          >
+          <label class="field__label" for="RegisterForm-email">
+            {{ 'customer.register.email' | t }}
+          </label>
+        </div>
+        
+        <div class="field mt-4">     
+          <input
+            class="field__input"
+            type="password"
+            name="customer[password]"
+            id="RegisterForm-password"
+            aria-required="true"
+            {% if form.errors contains 'password' %}
+              aria-invalid="true"
+              aria-describedby="RegisterForm-password-error"
+            {% endif %}
+            placeholder="{{ 'customer.register.password' | t }}"
+          >
+          <label class="field__label" for="RegisterForm-password">
+            {{ 'customer.register.password' | t }}
+          </label>
+        </div>
+
+        <button class="mt-4 btn w-full">
+          {{ 'customer.register.submit' | t }}
+        </button>
+
+        <p class="mt-12 text-silver text-center uppercase">
+          {{ 'customer.register.have_account' | t }} <a class="text-primary underline toggle-login-recover" href="{{ routes.account_login_url }}">{{ 'customer.login_page.sign_in' | t }}</a>
+        </p>
+      {%- endform -%}
+    </div>
+  </div>
+
+  {%- if settings.account_image -%}
+    <div class="hidden xl:block">
+    	{%- render 'img', image: settings.account_image -%}
+	</div>
+  {%- endif -%}
+</div>

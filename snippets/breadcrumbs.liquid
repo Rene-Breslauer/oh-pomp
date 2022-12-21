@@ -1,0 +1,75 @@
+{%- assign excluded_templates = settings.breadcrumbs_excluded_template | split: ',' -%}
+{% unless
+    settings.breadcrumbs_enable == false 
+    or template == 'index' 
+    or template == 'list-collections' 
+    or template contains 'login' 
+    or template contains 'register'
+    or excluded_templates contains template %}
+
+    {% assign t = template | split: '.' | first %}
+
+    <div class="page-width py-6 hidden xl:block">
+        <nav role="navigation" aria-label="breadcrumbs">
+            <ul class="flex">
+                <li>
+                    <a href="/" title="Home" class="uppercase text-sm">{{ 'general.social.home' | t }}</a>&nbsp;/&nbsp;
+                </li>
+
+                {% case t %}
+                    {% when 'page' %}
+                        <li>
+                            <span aria-current="page" class="uppercase text-sm text-silver">{{ page.title }}</span>
+                        </li>
+                    {% when 'product' %}
+                        {% if collection.url %}
+                            <li>
+                                <a href="{{ collection.url }}" title="{{ collection.title }}" class="text-sm uppercase">{{ collection.title }}</a>&nbsp;/&nbsp;
+                            </li>
+                        {% endif %}
+
+                        <li>
+                            <span aria-current="page" class="uppercase text-sm text-silver">{{ product.title }}</span>
+                        </li>
+                {% when 'collection' and collection.handle %}
+                    {% if current_tags %}
+                        <li><a href="{{ collection.url }}" title="{{ collection.title }}" class="text-sm uppercase">{{ collection.title }}</a>&nbsp;/&nbsp;</li>
+                        <li>
+                            <span aria-current="page" class="text-sm uppercase">{{ current_tags | join: " + " }}</span>
+                        </li>
+                    {% else %}
+                        <li >
+                            <span aria-current="page" class="uppercase text-sm text-silver">{{ collection.title }}</span>
+                        </li>
+                    {% endif %}
+
+                {% when 'blog' %}
+                    {% if current_tags %}
+                        <li><a href="{{ blog.url }}" title="{{ blog.title }}" class="text-sm uppercase">{{ blog.title }}</a>&nbsp;/&nbsp;</li>
+                        <li>
+                            <span aria-current="page" class="uppercase text-sm text-silver">{{ current_tags | join: " + " }}</span>
+                        </li>
+                    {% else %}
+                        <li >
+                            <span aria-current="page" class="uppercase text-sm text-silver">{{ blog.title }}</span>
+                        </li>
+                    {% endif %}
+
+                {% when 'article' %}
+                    <li><a href="{{ blog.url }}" title="{{ blog.title }}" class="text-sm uppercase">{{ blog.title }}</a>&nbsp;/&nbsp;</li>
+                    <li>
+                        <span aria-current="page" class="uppercase text-sm text-silver">{{ article.title }}</span>
+                    </li>
+              	{% when 'search' %}
+                    <li>
+                        <span aria-current="page" class="uppercase text-sm text-silver">{{ 'general.search.search' | t }}</span>
+                    </li>
+                {% else %}
+                    <li>
+                        <span aria-current="page" class="uppercase text-sm text-silver">{{ page_title }}</span>
+                    </li>
+                {% endcase %}
+            </ul>
+        </nav>
+    </div>
+{% endunless %}

@@ -1,0 +1,115 @@
+{% if template contains 'cart' %}
+{% else %}
+<script src="{{ 'product-form.js' | asset_url }}" defer="defer"></script>
+{% endif %}
+
+
+{%- liquid
+    assign second_image = product_card_product.images[1]
+-%}
+
+<div class="product-card {% if second_image %}product-card--second-img{% endif %} relative max-w-xl mx-auto">
+
+  {%- render 'product-badges', product: product_card_product -%}
+
+  {%- render 'wishlisthero-collection-product-v2' product: product_card_product -%}
+
+  {%- if product_card_product.featured_media -%}
+
+
+<div class="product-card-quick-buy-wrapper">
+    <div class="quick-buy-wrapper">
+   
+    <button class="quick-add-button">
+      Quick Add
+  </button>
+  <div class='options-grid'>
+      
+      {% for variant in product_card_product.variants -%}
+        {%- capture options -%}
+          {% for option in variant.options -%}
+            {{ option }}{%- unless forloop.last -%}/{%- endunless -%}
+          {%- endfor %}
+      {%- endcapture -%}
+      {% assign size = options   | split: '/' %}
+      <product-form>
+        <form method="post" action="/cart/add" class="form" enctype="multipart/form-data">
+        <input type="hidden" name="form_type" value="product" novalidate="novalidate" data-type='add-to-cart-form'>
+        <input
+          type="hidden"
+          name="id"
+          value="{{ variant.id }}" />
+        <input
+          min="1"
+          type="hidden"
+          id="quantity"
+          name="quantity"
+          value="1" />
+          {% if variant.available %}
+           <button
+          type="submit"
+          value={{size[0]}}
+          name="add"
+          class="button available"
+          style="margin-top:7px;" >
+          <div class="loading-overlay__spinner hidden"></div>
+          {{size[0]}}
+          </button>
+          {% else %}
+          <div class="button unavailable">
+            <div class="crossed">
+           {{size[0]}}
+           </div>
+          </div>
+          {% endif %}
+          </form>
+      </product-form>
+
+    {% endfor %}
+  </div>
+  </div> 
+
+    <a href="{{ product_card_product.url }}" class="relative
+                        w-full
+                        h-[25rem]
+                        xl:h-[52rem]
+                        block
+                        overflow-hidden
+                        product-link">
+                       
+                                                          
+      {% render 'img', image: product_card_product.featured_media %}
+      {%- if second_image -%}
+        {%- render 'img', image: second_image, class: 'hidden', loading: 'eager' -%}
+      {%- endif -%}
+    </a>
+
+    </div>
+ 
+
+{%- endif -%}
+
+
+
+<div class="mt-4">
+
+  {%- if product_card_product.vendor != blank -%}
+  <p class="text-sm 
+  text-silver 
+  uppercase
+  mb-1.5">{{ product_card_product.vendor }}</p>
+  {%- endif -%}
+<h4 class="uppercase max-w-md text-base font-normal">
+    <a href="{{ product_card_product.url }}">
+      {{ product_card_product.title }}
+
+    </a>
+  </h4>
+
+  <div class="mt-1">
+    {%- render 'price', product: product_card_product -%}
+  </div>
+
+  <div></div>
+
+</div>

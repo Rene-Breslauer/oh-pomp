@@ -1,0 +1,82 @@
+<details-modal class="w-max xl:hidden">
+    <details>
+        <summary class="" aria-haspopup="dialog" aria-label="{{ 'general.search.search' | t }}">
+            <span>
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 20 20" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M0.667969 9.15014C0.667969 4.46491 4.46613 0.666748 9.15136 0.666748C13.8366 0.666748 17.6348 4.46491 17.6348 9.15014C17.6348 13.8354 13.8366 17.6335 9.15136 17.6335C4.46613 17.6335 0.667969 13.8354 0.667969 9.15014ZM9.15136 2.04243C5.2259 2.04243 2.04365 5.22468 2.04365 9.15014C2.04365 13.0756 5.2259 16.2579 9.15136 16.2579C13.0768 16.2579 16.2591 13.0756 16.2591 9.15014C16.2591 5.22468 13.0768 2.04243 9.15136 2.04243Z" fill="#303030"/><path fill-rule="evenodd" clip-rule="evenodd" d="M14.2698 14.2682C14.5384 13.9995 14.974 13.9995 15.2426 14.2682L19.1336 18.1592C19.4022 18.4278 19.4022 18.8633 19.1336 19.132C18.865 19.4006 18.4295 19.4006 18.1609 19.132L14.2698 15.2409C14.0012 14.9723 14.0012 14.5368 14.2698 14.2682Z" fill="#303030"/></svg>
+            </span>
+        </summary>
+        <div class="modal__content pl-4 xl:pl-0 opacity-0 h-full" role="dialog" aria-modal="true" aria-label="{{ 'general.search.search' | t }}">
+            <div class="flex
+                    items-center
+                    justify-center
+                    w-full
+                    h-full
+                    relative
+                    bottom-0" tabindex="-1">
+            {%- if settings.predictive_search_enabled -%}
+                <predictive-search 
+                    class="w-full
+                        relative
+                        max-w-[45rem]" data-loading-text="{{ 'accessibility.loading' | t }}">
+            {%- endif -%}
+                <form action="{{ routes.search_url }}" method="get" role="search" class="search w-full max-w-[45rem]">
+                <div class="field">
+                    <input class="field__input search__input" 
+                    id="Search-In-Modal-Mobile"
+                    type="search"
+                    name="q"
+                    value=""
+                    placeholder="{{ 'general.search.search' | t }}"
+                    {%- if settings.predictive_search_enabled -%}
+                        role="combobox"
+                        aria-expanded="false"
+                        aria-owns="predictive-search-results-list"
+                        aria-controls="predictive-search-results-list"
+                        aria-haspopup="listbox"
+                        aria-autocomplete="list"
+                        autocorrect="off"
+                        autocomplete="off"
+                        autocapitalize="off"
+                        spellcheck="false"
+                    {%- endif -%}
+                    >
+                    <label class="field__label" for="Search-In-Modal-Mobile">{{ 'general.search.search' | t }}</label> 
+                    <input type="hidden" name="options[prefix]" value="last">
+                    <button class="search__button field__button" aria-label="{{ 'general.search.search' | t }}">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M0.667969 9.15014C0.667969 4.46491 4.46613 0.666748 9.15136 0.666748C13.8366 0.666748 17.6348 4.46491 17.6348 9.15014C17.6348 13.8354 13.8366 17.6335 9.15136 17.6335C4.46613 17.6335 0.667969 13.8354 0.667969 9.15014ZM9.15136 2.04243C5.2259 2.04243 2.04365 5.22468 2.04365 9.15014C2.04365 13.0756 5.2259 16.2579 9.15136 16.2579C13.0768 16.2579 16.2591 13.0756 16.2591 9.15014C16.2591 5.22468 13.0768 2.04243 9.15136 2.04243Z" fill="#303030"/><path fill-rule="evenodd" clip-rule="evenodd" d="M14.2698 14.2682C14.5384 13.9995 14.974 13.9995 15.2426 14.2682L19.1336 18.1592C19.4022 18.4278 19.4022 18.8633 19.1336 19.132C18.865 19.4006 18.4295 19.4006 18.1609 19.132L14.2698 15.2409C14.0012 14.9723 14.0012 14.5368 14.2698 14.2682Z" fill="#303030"/></svg>
+                    </button>
+                </div>
+
+                {%- if settings.predictive_search_enabled -%}
+                    <div class="predictive-search-wrapper
+                        hidden 
+                        w-full
+                        absolute
+                        top-full
+                        left-0
+                        border
+                        border-primary
+                        border-t-0
+                        bg-white
+                        z-50
+                        " tabindex="-1" data-predictive-search>
+                    <div class="predictive-search__loading-state">
+                        <svg aria-hidden="true" focusable="false" role="presentation" class="spinner" viewBox="0 0 66 66" xmlns="http://www.w3.org/2000/svg">
+                        <circle class="path" fill="none" stroke-width="6" cx="33" cy="33" r="30"></circle>
+                        </svg>
+                    </div>
+                    </div>
+
+                    <span class="predictive-search-status visually-hidden" role="status" aria-hidden="true"></span> 
+                {%- endif -%}
+                </form>
+            {%- if settings.predictive_search_enabled -%}
+                </predictive-search> 
+            {%- endif -%}
+            <button type="button" class="modal__close-button ml-2" aria-label="{{ 'accessibility.close' | t }}">
+                <svg class="icon icon-close" aria-hidden="true" focusable="false" role="presentation" viewBox="0 0 18 17" fill="none"  width="20" height="20"><path d="M.865 15.978a.5.5 0 00.707.707l7.433-7.431 7.579 7.282a.501.501 0 00.846-.37.5.5 0 00-.153-.351L9.712 8.546l7.417-7.416a.5.5 0 10-.707-.708L8.991 7.853 1.413.573a.5.5 0 10-.693.72l7.563 7.268-7.418 7.417z" fill="#303030"></path></svg>
+            </button>
+            </div>
+        </div>
+    </details>
+</details-modal>

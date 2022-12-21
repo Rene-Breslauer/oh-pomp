@@ -1,0 +1,36 @@
+{%- form 'customer' -%}
+    <input type="hidden" name="contact[tags]" value="newsletter"> 
+    <div class="field">
+        <input
+            id="NewsletterForm--{{ section.id }}"
+            type="email"
+            name="contact[email]"
+            class="field__input"
+            value="{{ form.email }}"
+            aria-required="true"
+            autocorrect="off"
+            autocapitalize="off"
+            autocomplete="email"
+            {% if form.errors %}
+            autofocus
+            aria-invalid="true"
+            aria-describedby="ContactFooter-error"
+            {% elsif form.posted_successfully? %}
+            aria-describedby="ContactFooter-success"
+            {% endif %}
+            placeholder="{{ 'newsletter.label' | t }}"
+            required
+        >
+        <label class="field__label" for="NewsletterForm--{{ section.id }}">
+            {{ 'newsletter.label' | t }}
+        </label>
+
+        <button type="submit" class="absolute h-full px-8 right-0 top-0 hover:opacity-70" name="commit" aria-label="{{ 'newsletter.button_label' | t }}">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="10" viewBox="0 0 14 10" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M0.500027 0.453513C0.500027 0.20306 0.70306 2.66668e-05 0.953513 2.66668e-05H13.0465C13.2969 2.66668e-05 13.5 0.20306 13.5 0.453513V9.52324C13.5 9.7737 13.2969 9.97673 13.0465 9.97673H0.953513C0.70306 9.97673 0.500027 9.7737 0.500027 9.52324V0.453513ZM1.407 0.907V9.06976H12.593V0.907H1.407Z" fill="#303030"/><path fill-rule="evenodd" clip-rule="evenodd" d="M0.590724 0.181421C0.740996 -0.0189417 1.02524 -0.0595482 1.22561 0.090724L7 4.42152L12.7744 0.090724C12.9748 -0.0595482 13.259 -0.0189417 13.4093 0.181421C13.5595 0.381784 13.5189 0.66603 13.3186 0.816303L7.27209 5.35117C7.11085 5.4721 6.88915 5.4721 6.72791 5.35117L0.681421 0.816303C0.481058 0.66603 0.440452 0.381784 0.590724 0.181421Z" fill="#303030"/><path fill-rule="evenodd" clip-rule="evenodd" d="M0.500027 0.453513C0.500027 0.20306 0.70306 2.66668e-05 0.953513 2.66668e-05H7C7.25045 2.66668e-05 7.45349 0.20306 7.45349 0.453513C7.45349 0.703967 7.25045 0.907 7 0.907H1.407V4.98838C1.407 5.23883 1.20397 5.44187 0.953513 5.44187C0.70306 5.44187 0.500027 5.23883 0.500027 4.98838V0.453513Z" fill="#303030"/><path fill-rule="evenodd" clip-rule="evenodd" d="M6.54651 0.453513C6.54651 0.20306 6.74955 2.66668e-05 7 2.66668e-05H13.0465C13.2969 2.66668e-05 13.5 0.20306 13.5 0.453513V4.98838C13.5 5.23883 13.2969 5.44187 13.0465 5.44187C12.796 5.44187 12.593 5.23883 12.593 4.98838V0.907H7C6.74955 0.907 6.54651 0.703967 6.54651 0.453513Z" fill="#303030"/><path fill-rule="evenodd" clip-rule="evenodd" d="M0.500027 0.453513C0.500027 0.20306 0.70306 2.66668e-05 0.953513 2.66668e-05H13.0465C13.2969 2.66668e-05 13.5 0.20306 13.5 0.453513V9.52324C13.5 9.7737 13.2969 9.97673 13.0465 9.97673H0.953513C0.70306 9.97673 0.500027 9.7737 0.500027 9.52324V0.453513ZM1.407 0.907V9.06976H12.593V0.907H1.407Z" fill="#303030"/><path fill-rule="evenodd" clip-rule="evenodd" d="M0.590724 0.181421C0.740996 -0.0189417 1.02524 -0.0595482 1.22561 0.090724L7 4.42152L12.7744 0.090724C12.9748 -0.0595482 13.259 -0.0189417 13.4093 0.181421C13.5595 0.381784 13.5189 0.66603 13.3186 0.816303L7.27209 5.35117C7.11085 5.4721 6.88915 5.4721 6.72791 5.35117L0.681421 0.816303C0.481058 0.66603 0.440452 0.381784 0.590724 0.181421Z" fill="#303030"/><path fill-rule="evenodd" clip-rule="evenodd" d="M0.500027 0.453513C0.500027 0.20306 0.70306 2.66668e-05 0.953513 2.66668e-05H7C7.25045 2.66668e-05 7.45349 0.20306 7.45349 0.453513C7.45349 0.703967 7.25045 0.907 7 0.907H1.407V4.98838C1.407 5.23883 1.20397 5.44187 0.953513 5.44187C0.70306 5.44187 0.500027 5.23883 0.500027 4.98838V0.453513Z" fill="#303030"/><path fill-rule="evenodd" clip-rule="evenodd" d="M6.54651 0.453513C6.54651 0.20306 6.74955 2.66668e-05 7 2.66668e-05H13.0465C13.2969 2.66668e-05 13.5 0.20306 13.5 0.453513V4.98838C13.5 5.23883 13.2969 5.44187 13.0465 5.44187C12.796 5.44187 12.593 5.23883 12.593 4.98838V0.907H7C6.74955 0.907 6.54651 0.703967 6.54651 0.453513Z" fill="#303030"/></svg>
+        </button>
+    </div>
+
+    {%- if form.posted_successfully? -%}
+        <div class="px-6 py-4 border border-primary mt-4" tabindex="-1" autofocus>{{ 'newsletter.success' | t }}</div>
+    {%- endif -%}
+{%- endform -%}

@@ -1,0 +1,297 @@
+<footer>
+
+  {%- liquid
+    assign logo = section.settings.logo
+    assign social_media = section.settings.social_media
+    assign heading = section.settings.title
+    assign subtitle = section.settings.subtitle
+    assign newsletter_title = section.settings.newsletter_title | escape | default: 'Subscribe'
+    assign newsletter_subtitle = section.settings.newsletter_subtitle
+    assign copyright = section.settings.copyright | escape
+    assign policies_menu = section.settings.policies_menu
+    assign display_crafted_by = section.settings.display_crafted_by
+  -%}
+
+  <div class="py-8
+    xl:py-24 
+    border-t
+    border-primary">
+
+    <div class="page-width page-width--smaller">
+      <div class="grid
+        grid-cols-1
+        xl:grid-cols-footer
+        gap-0
+        xl:gap-24
+        justify-between
+        align-center">
+        <div class="grid
+          xl:grid-flow-col
+          xl:auto-cols-max
+          grid-cols-1
+          gap-10
+          justify-between
+          items-center">
+          {%- if logo != blank -%}
+            <div class="self-center">
+              <a href="{{ routes.root_url }}" class="flex justify-center xl:justify-start">
+                {{ logo }}
+              </a>
+            </div>
+          {%- endif -%}
+          {%- if social_media -%}
+            <div class="self-center">
+              {%- render 'social-media' -%}
+            </div>
+          {%- endif -%}
+        </div>
+
+        {%- if heading != blank -%}
+          <div class="text-center
+            pt-6
+            mt-8
+            border-t
+            xl:text-left
+            xl:p-0
+            xl:m-0
+            xl:border-0">
+            <h2 class="styled-span">
+              {{ heading }}
+            </h2>
+            {%- if subtitle != blank -%}
+              <div class="text-lg">
+                {{ subtitle }}
+              </div>
+            {%- endif -%}
+          </div>
+        {%- endif -%}
+      </div>
+    </div>
+
+  </div>
+
+  <div class="py-8
+    xl:py-28
+    border-t
+    border-primary/10">
+
+    <div class="page-width page-width--smaller">
+      <div class="grid
+        grid-cols-1
+        xl:grid-cols-footer
+        gap-8
+        xl:gap-24
+        justify-between
+        align-center">
+        <div>
+          <h6 class="text-center xl:text-left">{{ newsletter_title }}</h6>
+          <h2 class="styled-span 
+            mt-2 
+            xl:mt-8 
+            mb-6
+            xl:mb-11 
+            text-center 
+            xl:text-left">{{ newsletter_subtitle }}</h2>
+          {%- render 'footer-newsletter' -%}
+        </div>
+
+        <div class="grid
+          grid-cols-1
+          xl:grid-cols-4
+          gap-0
+          xl:gap-10">
+
+          {%- if section.blocks.size > 0 -%}
+            {%- for block in section.blocks -%}
+              {%- assign menu = block.settings.menu -%}
+              {%- if menu != blank -%}
+                {%- assign menu = linklists[menu] -%}
+                  {%- if menu.links.size > 0 -%}
+                    <div>
+                      <div class="hidden xl:block">
+                        <h6>{{ menu.title }}</h6>
+
+                        <ul class="mt-8">
+                          {%- for link in menu.links -%}
+                            <li class="{% unless forloop.last %}mb-9{% endunless %}">
+                              <a href="{{ link.url }}" class="uppercase">{{ link.title }}</a>
+                            </li>
+                          {%- endfor -%}
+                        </ul>
+                      </div>
+
+                      <div class="xl:hidden">
+                        <details class="dropdown-effect">
+                          <summary>
+                            <h4 class="
+                              w-[calc(100%_+_4rem)]
+                              -ml-8
+                              px-8
+                              py-6
+                              -mt-[1px]
+                              border-t 
+                              border-b 
+                              flex 
+                              items-center 
+                              justify-between">
+                                {{ menu.title }}
+                                {%- render 'icon-caret' -%}
+                              </h4>
+                          </summary>
+                          <div>
+                            <ul class="py-3">
+                              {%- for link in menu.links -%}
+                                <li>
+                                  <a href="{{ link.url }}" class="py-3 inline-block uppercase">{{ link.title }}</a>
+                                </li>
+                              {%- endfor -%}
+                            </ul>
+                          </div>
+                        </details>
+                      </div>
+                    </div>
+                  {%- endif -%}
+              {%- endif -%}
+            {%- endfor -%}
+          {%- endif -%}
+        </div>
+      </div>
+    </div>
+
+  </div>
+  
+  <div class="pb-8
+    xl:py-14
+    xl:border-t
+    xl:border-primary/10">
+    <div class="page-width page-width--smaller">
+      <div class="grid
+              grid-cols-1
+              xl:grid-cols-[33%_1fr_33%]
+              gap-y-3
+              gap-x-6
+              items-center
+              justify-between">
+
+        {%- if copyright != blank -%}
+          <div><p class="text-sm 
+            text-silver 
+            uppercase
+            text-center
+            xl:text-left">&copy; {{ "now" | date: "%Y" }} {{ copyright }}</p></div>
+        {%- endif -%}
+
+        {%- if policies_menu != blank -%}
+          {%- assign policies_menu = linklists[policies_menu] -%}
+          {%- if policies_menu.links.size > 0 -%}
+              <ul class="grid 
+                     grid-flow-col 
+                     auto-cols-max
+                     gap-8
+                     xl:gap-12
+                     justify-center 
+                     items-center">
+                {%- for link in policies_menu.links -%}
+                  <li>
+                    <a href="{{ link.url }}" class="text-sm text-silver uppercase">{{ link.title }}</a>
+                  </li>
+                {%- endfor -%}
+              </ul>
+          {%- endif -%}
+        {%- endif -%}
+
+        {%- if display_crafted_by -%}
+          <div class="flex
+                  items-center
+                  justify-center
+                  xl:justify-end
+                  text-sm
+                  text-silver
+                  uppercase">
+              <a href="https://www.absoluteweb.com/" target="_blank" class="crafted-by flex items-center w-max">Crafted By <span class="ml-2 flex">{%- render 'icon-aws' -%}</span></a>
+          </div>
+        {%- endif -%} 
+      </div>
+    </div>
+  </div>
+</footer>
+
+{% schema %}
+{
+  "name": "Footer",
+  "max_blocks": 4,
+  "settings": [
+    {
+      "type": "header",
+      "content": "Footer top"
+    },
+    {
+      "type": "html",
+      "id": "logo",
+      "label": "Logo (SVG)"
+    },
+    {
+      "type": "checkbox",
+      "id": "social_media",
+      "label": "Display social media icons",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Title"
+    },
+    {
+      "type": "richtext",
+      "id": "subtitle",
+      "label": "Subtitle"
+    },
+    {
+      "type": "header",
+      "content": "Newsletter"
+    },
+    {
+      "type": "text",
+      "id": "newsletter_title",
+      "label": "Newsletter title"
+    },
+    {
+      "type": "text",
+      "id": "newsletter_subtitle",
+      "label": "Newsletter subtitle"
+    },
+	{
+      "type": "header",
+      "content": "Footer bottom"
+    },
+    {
+      "type": "text",
+      "id": "copyright",
+      "label": "Copyright text"
+    },
+	{
+      "type": "link_list",
+      "id": "policies_menu",
+      "label": "Policies menu"
+    },
+	{
+      "type": "checkbox",
+      "id": "display_crafted_by",
+      "label": "Display crafted by text"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "menu",
+      "name": "Menu",
+      "settings": [
+        {
+          "type": "link_list",
+          "id": "menu",
+          "label": "Menu"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

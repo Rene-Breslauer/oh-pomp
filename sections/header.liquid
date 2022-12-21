@@ -1,0 +1,305 @@
+{%- liquid
+    assign sticky = section.settings.sticky
+    assign logo = section.settings.logo
+-%}
+
+{% if template != 'cart' %}
+    <script src="{{ 'cart-notification.js' | asset_url }}" defer="defer"></script>
+{% endif %}
+
+<header class="relative border-b {% if sticky %}float{% endif %}">
+    <div class="page-width">
+        <div class="grid
+            grid-cols-[20%_1fr_20%]
+            xl:grid-cols-[40%_1fr_40%]
+            gap-x-6
+            items-center
+            justify-between
+            py-6
+            xl:py-0">
+
+            <div class="flex items-center">
+                {%- render 'header-menu' -%}
+                {%- render 'header-search-mobile' -%}
+            </div>
+
+            <div>
+                {%- if logo != blank -%}
+                    <a href="{{ routes.root_url }}" class="flex w-[14rem] xl:w-min mx-auto">
+                        {{ logo }}
+                    </a>
+                {%- endif -%}
+            </div>
+
+            <div class="flex justify-end items-center">
+                {%- render 'header-search' -%}
+
+                <div class="mr-12 hidden xl:block">
+                    <a href="#hero-wishlist" class="flex">
+                        {%- render 'icon-wishlist' -%}
+                    </a>
+                </div>
+
+                <div class="mr-8 xl:mr-12">
+                    <a href="{{ routes.account_url }}" class="flex">
+                        {%- render 'icon-account' -%}
+                    </a>
+                </div>
+
+                <div>
+                    <a href="{{ routes.cart_url }}" class="flex relative" id="cart-icon-bubble">
+                        {%- render 'icon-cart' -%}
+                        {%- if cart != empty -%}
+                            <div class="hidden xl:block cart-count-bubble ml-4">
+                                <span class="uppercase text-sm">{{ 'sections.header.cart_count' | t: count: cart.item_count }}</span>
+                            </div>
+                            <div class="xl:hidden
+                                absolute
+                                top-0
+                                right-0
+                                h-4
+                                w-4
+                                border-2
+                                border-white
+                                rounded-full
+                                bg-jasper
+                                z-[1]
+                                "></div>
+                        {%- endif -%}
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+{%- render 'cart-mini', color_scheme: section.settings.color_scheme -%}
+
+{% unless template contains 'cart' %}
+    {%- if sticky -%}
+        <script>
+            window.addEventListener('DOMContentLoaded', (event) => {
+                const $header = document.querySelector('header.float')
+                if ($header !== null) {
+                    const headerTopOffset = $header.offsetTop
+                    // const PDPContainerOffset = $header.offsetHeight + 50
+                    const $PDPContainer = document.querySelector('.product-main-wrapper')
+
+                    document.addEventListener('scroll', function(e) {
+                        if (window.scrollY >= headerTopOffset) {
+                            $header.classList.add('float--active')
+                            if ($PDPContainer !== null) {
+                                $PDPContainer.classList.add('offsetTop-129')
+                                // $PDPContainer.style.marginTop = `${PDPContainerOffset}px`
+                            }
+                        } else {
+                            $header.classList.remove('float--active')
+                            if ($PDPContainer !== null) {
+                                $PDPContainer.classList.remove('offsetTop-129')
+                                // $PDPContainer.style.marginTop = `0`
+                            }
+                        }
+                    })
+                }
+            })
+        </script>
+    {%- endif -%}
+{%- endunless -%}
+
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "Organization",
+    "name": {{ shop.name | json }},
+    {% if section.settings.logo %}
+      "logo": {{ section.settings.logo | image_url: width: section.settings.logo.width | prepend: "https:" | json }},
+    {% endif %}
+    "sameAs": [
+      {{ settings.social_twitter_link | json }},
+      {{ settings.social_facebook_link | json }},
+      {{ settings.social_pinterest_link | json }},
+      {{ settings.social_instagram_link | json }},
+      {{ settings.social_tiktok_link | json }},
+      {{ settings.social_tumblr_link | json }},
+      {{ settings.social_snapchat_link | json }},
+      {{ settings.social_youtube_link | json }},
+      {{ settings.social_vimeo_link | json }}
+    ],
+    "url": {{ request.origin | append: page.url | json }}
+  }
+</script>
+
+{%- if request.page_type == 'index' -%}
+    {% assign potential_action_target = request.origin | append: routes.search_url | append: "?q={search_term_string}" %}
+    <script type="application/ld+json">
+    {
+      "@context": "http://schema.org",
+      "@type": "WebSite",
+      "name": {{ shop.name | json }},
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": {{ potential_action_target | json }},
+        "query-input": "required name=search_term_string"
+      },
+      "url": {{ request.origin | append: page.url | json }}
+    }
+  </script>
+{%- endif -%}
+
+{% schema %}
+{
+    "name": "Header",
+    "settings": [
+        {
+            "type": "checkbox",
+            "id": "sticky",
+            "label": "Sticky?",
+            "default": true
+        },
+        {
+            "type": "html",
+            "id": "logo",
+            "label": "Logo (SVG)"
+        }
+    ],
+    "blocks": [
+        {
+            "type": "menu_item",
+            "name": "menu item",
+            "settings": [
+                {
+                    "type": "checkbox",
+                    "id": "hide_on_desktop",
+                    "label": "Hide on desktop"
+                },
+                {
+                    "type": "text",
+                    "id": "title",
+                    "label": "Menu title"
+                },
+                {
+                    "type": "url",
+                    "id": "url",
+                    "label": "Menu link"
+                },
+                {
+                    "type": "link_list",
+                    "id": "simple_menu",
+                    "label": "Simple menu"
+                },
+                {
+                    "type": "text",
+                    "id": "simple_menu_button_label",
+                    "label": "Simple menu button label"
+                },
+                {
+                    "type": "url",
+                    "id": "simple_menu_button_link",
+                    "label": "Simple menu button link"
+                },
+                {
+                    "type": "image_picker",
+                    "id": "simple_menu_image",
+                    "label": "Simple menu image"
+                },
+                {
+                    "type": "html",
+                    "id": "simple_menu_popup_content",
+                    "label": "Simple menu popup content",
+                    "info": "Leave blank to deactivate"
+                },
+                {
+                    "type": "header",
+                    "content": "Megamenu"
+                },
+                {
+                    "type": "checkbox",
+                    "id": "megamenu_enable",
+                    "label": "Enable megamenu",
+                    "default": false
+                },
+                {
+                    "type": "link_list",
+                    "id": "megamenu_col1_menu",
+                    "label": "Column 1 menu"
+                },
+                {
+                    "type": "text",
+                    "id": "megamenu_col1_button_label",
+                    "label": "Column 1 button label"
+                },
+                {
+                    "type": "url",
+                    "id": "megamenu_col1_button_link",
+                    "label": "Column 1 button link"
+                },
+                {
+                    "type": "link_list",
+                    "id": "megamenu_col2_menu",
+                    "label": "Column 2 menu"
+                },
+                {
+                    "type": "text",
+                    "id": "megamenu_col2_button_label",
+                    "label": "Column 2 button label"
+                },
+                {
+                    "type": "url",
+                    "id": "megamenu_col2_button_link",
+                    "label": "Column 2 button link"
+                },
+                {
+                    "type": "image_picker",
+                    "id": "megamenu_col3_image",
+                    "label": "Column 3 image"
+                },
+                {
+                    "type": "text",
+                    "id": "megamenu_col3_title",
+                    "label": "Column 3 title"
+                },
+                {
+                    "type": "text",
+                    "id": "megamenu_col3_subtitle",
+                    "label": "Column 3 subtitle"
+                },
+                {
+                    "type": "text",
+                    "id": "megamenu_col3_button_label",
+                    "label": "Column 3 button label"
+                },
+                {
+                    "type": "url",
+                    "id": "megamenu_col3_button_link",
+                    "label": "Column 3 button link"
+                },
+                {
+                    "type": "image_picker",
+                    "id": "megamenu_col4_image",
+                    "label": "Column 4 image"
+                },
+                {
+                    "type": "text",
+                    "id": "megamenu_col4_title",
+                    "label": "Column 4 title"
+                },
+                {
+                    "type": "text",
+                    "id": "megamenu_col4_subtitle",
+                    "label": "Column 4 subtitle"
+                },
+                {
+                    "type": "text",
+                    "id": "megamenu_col4_button_label",
+                    "label": "Column 4 button label"
+                },
+                {
+                    "type": "url",
+                    "id": "megamenu_col4_button_link",
+                    "label": "Column 4 button link"
+                }
+            ]
+        }
+    ]
+}
+{% endschema %}

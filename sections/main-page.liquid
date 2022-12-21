@@ -1,0 +1,65 @@
+{%- liquid
+    assign padding_top = section.settings.padding_top | default: 0
+    assign padding_bottom = section.settings.padding_bottom | default: 0
+    assign margin_top = section.settings.margin_top | default: 0
+    assign margin_bottom = section.settings.margin_bottom | default: 0
+-%}
+
+{%- render 'offset' 
+	id: section.id
+	padding_top: padding_top, 
+	padding_bottom: padding_bottom,
+	margin_top: margin_top,
+	margin_bottom: margin_bottom
+-%}
+
+<section id="section-{{ section.id }}">
+	<div class="page-width">
+		<div class="max-w-[90rem] mx-auto">
+			<h1 class="text-center text-2xl xl:text-5xl">
+				{{ page.title | escape }}
+			</h1>
+			<div class="mt-12 xl:mt-24 rte">
+				{{ page.content }}
+			</div>
+		</div>
+	</div>
+</section>
+
+{% schema %}
+{
+  "name": "t:sections.main-page.name",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+      "type": "number",
+      "id": "padding_top",
+      "label": "Padding top (rem)",
+      "default": 0,
+      "info": "1rem = 10px"
+    },
+    {
+      "type": "number",
+      "id": "padding_bottom",
+      "label": "Padding bottom (rem)",
+      "default": 0,
+      "info": "1rem = 10px"
+    },
+    {
+      "type": "number",
+      "id": "margin_top",
+      "label": "Margin top (rem)",
+      "default": 100,
+      "info": "1rem = 10px"
+    },
+    {
+      "type": "number",
+      "id": "margin_bottom",
+      "label": "Margin bottom (rem)",
+      "default": 100,
+      "info": "1rem = 10px"
+    }
+  ]
+}
+{% endschema %}

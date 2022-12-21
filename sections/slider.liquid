@@ -1,0 +1,247 @@
+{%- if section.blocks.size > 0 -%}
+    {{ 'slider.css' | asset_url | stylesheet_tag }}
+
+    <section id="splide-{{ section.id }}" class="splide" aria-label="{{ store.name }} main slider">
+        <div class="splide__track">
+            <ul class="splide__list">
+                {% for block in section.blocks %}
+                    {%- liquid
+                        assign type = block.settings.type
+                        assign image = block.settings.image
+                        assign video_url = block.settings.video_url
+                        assign title_top = block.settings.title_top
+                        assign title = block.settings.title
+                        assign subtitle = block.settings.subtitle
+                        assign subtitle_bottom = block.settings.subtitle_bottom
+                        assign button_label = block.settings.button_label | escape
+                        assign button_link = block.settings.button_link
+                        assign popup_content = block.settings.popup_content
+                    -%}
+                    {%- if image 
+                        or video_url != blank -%}
+                        <li class="splide__slide">
+                            {%- if popup_content != blank -%}
+                                <modal-dialog id="Modal-{{ block.id }}">
+                                    <div role="dialog" aria-label="" aria-modal="true" class="popup__content popup__content--transparent" tabindex="-1">
+                                        <button id="ModalClose-slider" type="button" class="popup__close" aria-label="{{ 'accessibility.close' | t }}">{%- render 'icon-close' -%}</button>
+                                        <div class="popup__inner">
+                                            {{ popup_content }}
+                                        </div>
+                                    </div>
+                                </modal-dialog>
+                            {%- endif -%}
+
+                            <div class="splide-slide__inner
+                                relative 
+                                flex 
+                                items-center 
+                                justify-center
+                                px-6
+                                xl:px-20">
+
+                                {%- if title != blank -%}
+                                    <div class="w-full max-w-[90%] xl:max-w-screen-lg">
+                                        {%- if title_top != blank -%}
+                                            <p class="mb-1
+                                                xl:mb-4
+                                                font-bold
+                                                text-inverted
+                                                text-1xl
+                                                xl:text-3xl
+                                                text-center
+                                                styled-span
+                                                !normal-case">{{ title_top }}</p> 
+                                        {%- endif -%}
+                                  
+                                        <h2 class="text-center
+                                            text-inverted
+                                            text-6xl
+                                            xl:text-9xl
+                                            mb-0
+                                            styled-span"> 
+                                            {{ title }}
+                                        </h2>
+
+                                        {%- if subtitle != blank -%}
+                                            <p class="mt-1
+                                                xl:mt-4
+                                                font-bold
+                                                text-inverted
+                                                text-3xl
+                                                xl:text-8xl
+                                                text-center
+                                                styled-span
+                                                !normal-case">{{ subtitle }}</p> 
+                                        {%- endif -%}
+
+                                        {%- if subtitle_bottom != blank -%}
+                                            <p class="mt-1
+                                                xl:mt-4
+                                                text-inverted
+                                                text-bases
+                                                xl:text-1xl
+                                                text-center
+                                                styled-span
+                                                !normal-case">{{ subtitle_bottom }}</p> 
+                                        {%- endif -%}
+
+                                        {%- if button_label != blank
+                                            and button_link != blank -%}
+                                            <div class="flex justify-center mt-5 xl:mt-9">
+                                                {%- if popup_content != blank -%}
+                                                    <modal-opener class="popup__opener popup__opener--slider no-js-hidden" data-modal="#Modal-{{ block.id }}">
+                                                        <button class="popup__button btn btn--inverted" type="button" aria-haspopup="dialog">{{ button_label }}</button>
+                                                    </modal-opener>
+                                                {%- else -%}
+                                                    <a class="btn btn--inverted" href="{{ button_link }}">
+                                                        {{ button_label }}
+                                                    </a>
+                                                {%- endif -%}
+                                            </div>
+                                        {%- endif -%}
+                                    </div>
+                                {%- endif -%}
+                                
+                                {%- case type -%}
+                                    {%- when 'image' -%}
+                                        {%- if image != blank -%}
+                                            {%- render 'img', image: image -%}
+                                        {%- endif -%}
+                                    
+                                    {%- when 'video' -%}
+                                        {%- if video_url != blank -%}
+                                            {%- render 'video', video_url: video_url -%}
+                                        {%- endif -%}
+                                {%- endcase -%}
+                            </div>  
+                        </li>
+                    {%- endif -%}
+                {% endfor %}
+            </ul>
+        </div>
+
+        <ul class="splide__pagination splide__pagination--inverted"></ul>
+
+        {%- liquid
+            assign height_mobile = section.settings.height_mobile | default: 50 | append: 'rem'
+            assign height_desktop = section.settings.height_desktop | default: 100 | append: 'rem'
+        -%}
+
+        <style>
+            .splide-slide__inner {
+                height: {{ height_mobile }};
+            }
+
+            @media (min-width: 1280px) {
+                .splide-slide__inner {
+                    height: {{ height_desktop }};
+                }
+            }
+        </style>
+    </section>
+
+    <script>
+        window.addEventListener('DOMContentLoaded', (event) => {
+            let slider_selector = '#splide-' + "{{ section.id }}"
+            new Splide( slider_selector, {
+                arrows: false, 
+            } ).mount()
+        })
+    </script>
+{%- endif -%}
+
+{% schema %}
+    {
+        "name": "Slider",
+        "settings": [
+            {
+                "type": "number",
+                "id": "height_mobile",
+                "label": "Height (mobile)",
+                "info": "In REM, 1rem = 10px"
+            },
+            {
+                "type": "number",
+                "id": "height_desktop",
+                "label": "Height (desktop)",
+                "info": "In REM, 1rem = 10px"
+            }
+        ],
+        "blocks": [
+            {
+                "type": "slide",
+                "name": "slide",
+                "settings": [
+                    {
+                        "type": "select",
+                        "id": "type",
+                        "label": "Type",
+                        "options": [
+                            {
+                                "value": "image",
+                                "label": "Image"
+                            },
+                            {
+                                "value": "video",
+                                "label": "Video"
+                            }
+                        ],
+                        "default": "image"
+                    },
+                    {
+                        "type": "image_picker",
+                        "id": "image",
+                        "label": "Image"
+                    },
+                    {
+                        "type": "text",
+                        "id": "video_url",
+                        "label": "Video URL",
+                        "info": "Upload a video in the mp4 format under Settings -> Files, then copy and paste its URL here."
+                    },
+                    {
+                        "type": "text",
+                        "id": "title_top",
+                        "label": "Title (top)"
+                    },
+                    {
+                        "type": "text",
+                        "id": "title",
+                        "label": "Title"
+                    },
+                    {
+                        "type": "text",
+                        "id": "subtitle",
+                        "label": "Subtitle"
+                    },
+                    {
+                        "type": "text",
+                        "id": "subtitle_bottom",
+                        "label": "Subtitle (bottom)"
+                    },
+                    {
+                        "type": "text",
+                        "id": "button_label",
+                        "label": "Button label"
+                    },
+                    {
+                        "type": "url",
+                        "id": "button_link",
+                        "label": "Button link"
+                    },
+                    {
+                        "type": "html",
+                        "id": "popup_content",
+                        "label": "Popup content",
+                        "info": "Leave blank to deactivate."
+                    }
+                ]
+            }
+        ],
+        "presets": [
+            {
+                "name": "Slider"
+            }
+        ]
+    }
+{% endschema %}
