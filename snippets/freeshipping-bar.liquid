@@ -1,0 +1,55 @@
+{% if settings.cart_freeshipping_price > 0 %}
+  <style>
+    .cart__freeshipping-bar p {
+      color: #303030;
+      font-size: 12px;
+      line-height: 15px;
+      text-transform: uppercase;
+    }
+    .cart__freeshipping-bar p span {
+      color: #D44040;
+    }
+    .cart__freeshipping-bar__body {
+      width: 100%;
+      height: 5px;
+      margin: 7px 0 6px;
+      border-radius: 3px;
+      background: #F1F1F1;
+    }
+    .cart__freeshipping-bar__body__progress {
+      height: inherit;
+      border-radius: 3px;
+      background: #303030;
+    }
+    .cart__freeshipping-bar__price {
+      color: #B3B3B3;
+      font-size: 10px;
+      line-height: 10px;
+    }
+  </style>
+
+  {% assign cartFreeshippingPrice = settings.cart_freeshipping_price | times: 100 %}
+  {% assign awayFromFreeShipping = cartFreeshippingPrice | minus: cart.total_price %}
+
+  <div class="py-8 {% unless template contains 'cart' %}px-14{% endunless %} border-b border-flash w-full">
+    <div class="cart__freeshipping-bar">
+      {% if awayFromFreeShipping > 0 %}
+
+        {% assign awayFromFreeShipping = awayFromFreeShipping | money %}
+        {% assign cartFreeshippingPrice_percent = cartFreeshippingPrice | divided_by: 100 %}
+        {% capture wayForFreeShipping %}
+          <span>{{ awayFromFreeShipping }}</span>
+        {% endcapture %}
+
+        <p>{{ settings.cart_freeshipping_text | replace: 'price', wayForFreeShipping }}</p>
+        <div class="cart__freeshipping-bar__body">
+          <div class="cart__freeshipping-bar__body__progress" style="width: {{ cart.total_price | divided_by: cartFreeshippingPrice_percent }}%"></div>
+        </div>
+        <div class="cart__freeshipping-bar__price text-right">{{ cartFreeshippingPrice | money }}</div>
+
+      {% else %}
+        <p class="w-full text-center">{{ settings.cart_freeshipping_text_done }}</p>
+      {% endif %}
+    </div>
+  </div>
+{% endif %}

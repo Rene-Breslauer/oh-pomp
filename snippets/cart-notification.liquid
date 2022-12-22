@@ -1,0 +1,68 @@
+{% comment %}
+    Renders cart notification
+
+    Accepts:
+    - color_scheme: {String} sets the color scheme of the notification (optional)
+
+    Usage:
+    {% render 'cart-notification' %}
+{% endcomment %}
+
+{{ 'mini-cart.css' | asset_url | stylesheet_tag }}
+
+<cart-notification>
+  <div class="relative page-width">
+    <div id="cart-notification" class="fixed
+            top-0
+            right-0
+
+            w-full
+            invisible
+            transform
+            -translate-y-full
+            bg-white
+            py-10
+            px-14
+            border-2
+            border-primary" aria-modal="true" aria-label="{{ 'general.cart.item_added' | t }}" role="dialog" tabindex="-1">
+      <div id="cart-notification__ajaxBody">
+        <div id="cart-notification__header" class="flex items-center justify-between">
+          <h2 class="text-1xl mb-0">MY CART
+            <span>
+              <span id="cart-notification__header__items-count">{{ cart.item_count }}</span>
+              {%- if cart.item_count == 1 -%}
+                {{ 'sections.cart.totals_item' | t }}
+              {%- else -%}
+                {{ 'sections.cart.totals_items' | t }}
+              {%- endif -%}
+            </span>
+          </h2>
+
+          <button type="button" class="flex" aria-label="{{ 'accessibility.close' | t }}">
+            {%- render 'icon-close' -%}
+          </button>
+        </div>
+
+        <minicart-items id="cart-notification-product" class="flex flex-wrap pb-10" data-id="{{ section.id }}"></minicart-items>
+      </div>
+
+      <div id="cart-notification__footer" class="px-14">
+        {% comment %}<a href="{{ routes.cart_url }}" id="cart-notification-button" class="btn btn--inverted btn--secondary w-full"></a>{% endcomment %}
+        <div id="cart-notification__total" class="flex justify-between">
+          <span>Subtotal</span>
+          <span id="cart-notification__total__price">{{ cart.total_price | money }}</span>
+        </div>
+        <form action="{{ routes.cart_url }}" method="post" id="cart-notification-form">
+          <button class="btn w-full mt-4" name="checkout">{{ 'sections.cart.checkout' | t }}</button>
+        </form>
+        {% comment %}<button type="button" class="btn btn--inverted btn--secondary w-full mt-4">{{ 'general.continue_shopping' | t }}</button>{% endcomment %}
+
+        <div>
+          {%- form 'cart', cart -%}
+            {{ form | payment_terms }}
+          {%- endform -%}
+        </div>
+      </div>
+    </div>
+  </div>
+</cart-notification>

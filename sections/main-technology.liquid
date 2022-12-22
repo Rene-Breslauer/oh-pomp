@@ -1,0 +1,173 @@
+{%- if section.settings.title != blank -%}
+	{%- liquid
+        assign padding_top = section.settings.padding_top | default: 0
+        assign padding_bottom = section.settings.padding_bottom | default: 0
+        assign margin_top = section.settings.margin_top | default: 0
+        assign margin_bottom = section.settings.margin_bottom | default: 0
+        assign heading = section.settings.title
+        assign subtitle = section.settings.subtitle | escape
+        assign content = section.settings.content | strip_html
+        assign image = section.settings.image
+    -%}
+
+	{%- render 'offset' 
+        id: section.id
+        padding_top: padding_top, 
+        padding_bottom: padding_bottom,
+        margin_top: margin_top,
+        margin_bottom: margin_bottom
+    -%}
+	
+    <section id="section-{{ section.id }}">
+      <div class="relative 
+	  	xl:-mt-[4.8rem] 
+		py-8
+		xl:py-[9rem]">
+        <div class="page-width">
+          <div class="max-w-screen-2xl mx-auto">
+            <div class="max-w-[90rem]">
+                <h1 class="text-6xl 
+                    xl:text-8xl 
+                    styled-span
+                    break-words">{{ heading }}</h1>
+
+                {%- if subtitle != blank -%}
+                    <p class="mt-2 xl:mt-6 font-bold text-1xl xl:text-3xl">{{ subtitle }}</p>
+                {%- endif -%}
+
+                {%- if content != blank -%}
+                    <p class="mt-3 xl:mt-6 text-lg max-w-[57.4rem]">{{ content }}</p>
+                {%- endif -%}
+              
+                {%- if section.blocks.size > 0 -%}
+                    <ul class="mt-8 xl:mt-14 xl:grid grid-cols-2 gap-x-8 gap-y-14">
+                        {%- for block in section.blocks -%}
+                            {%- liquid
+                                assign info_title = block.settings.title | escape
+                                assign info_subtitle = block.settings.subtitle | escape
+                                assign info_icon = block.settings.icon
+                            -%}
+                            {%- if info_title != blank -%}
+                                <li class="{% unless forloop.last %}mb-8 xl:mb-0{% endunless %}">
+                                    <div class="flex items-center">
+                                        {%- if info_icon != blank -%}
+                                            <div class="w-28 mr-6 flex justify-center items-center">
+                                                {{ info_icon }}
+                                            </div>
+                                        {%- endif -%}
+
+                                        <div>
+                                            <h4 class="text-1xl xl:text-3xl mb-0">{{ info_title }}</h4>
+                                            {%- if info_subtitle != blank -%}
+                                                <p class="text-lg">{{ info_subtitle }}</p>
+                                            {%- endif -%}
+                                        </div>
+                                    </div>
+                                </li>
+                            {%- endif -%}
+                        {%- endfor -%}
+                    </ul>
+                {%- endif -%}
+            </div>
+          </div>
+        </div>
+        
+        {%- if image -%}
+        	<div class="absolute 
+				hidden 
+				xl:block 
+				top-0 
+				right-0 
+				h-full 
+				w-[74.7rem] 
+				-z-10">
+              {%- render 'img', image: image -%}
+        	</div>
+        {%- endif -%}
+      </div>
+    </section>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Technology",
+  "settings": [
+	{
+      "type": "number",
+      "id": "padding_top",
+      "label": "Padding top (rem)",
+      "default": 0,
+      "info": "1rem = 10px"
+    },
+    {
+      "type": "number",
+      "id": "padding_bottom",
+      "label": "Padding bottom (rem)",
+      "default": 0,
+      "info": "1rem = 10px"
+    },
+    {
+      "type": "number",
+      "id": "margin_top",
+      "label": "Margin top (rem)",
+      "default": 100,
+      "info": "1rem = 10px"
+    },
+    {
+      "type": "number",
+      "id": "margin_bottom",
+      "label": "Margin bottom (rem)",
+      "default": 100,
+      "info": "1rem = 10px"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Title"
+    },
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Subtitle"
+    },
+    {
+      "type": "richtext",
+      "id": "content",
+      "label": "Content"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Image"
+    }
+  ],
+  "blocks": [
+    {
+    "type": "info",
+    "name": "info",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title"
+        },
+        {
+          "type": "text",
+          "id": "subtitle",
+          "label": "Subtitle"
+        },
+        {
+          "type": "html",
+          "id": "icon",
+          "label": "Icon"
+        }
+      ]
+    }
+  ],
+  "presets":[
+    {
+    	"name": "Technology"
+    }
+  ]
+}
+{% endschema %}

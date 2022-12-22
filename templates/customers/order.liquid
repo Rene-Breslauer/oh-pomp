@@ -1,0 +1,243 @@
+<div class="page-width">
+  <div class="max-w-[90rem] mx-auto pt-10 xl:pt-14 pb-8 xl:pb-28">
+    
+    <h1 class="text-2xl xl:text-5xl text-center mb-0">{{ 'customer.account.title' | t }}</h1>
+    
+    <div class="mt-10 xl:mt-20">
+      <h2 class="text-lg xl:text-2xl mb-0">{{ 'customer.order.title' | t: name: order.name }}</h2>
+      
+      <div class="mt-6 xl:mt-10">
+        {%- assign order_date = order.created_at | time_tag: format: "date_at_time" -%}
+        <p class="py-2">{{ 'customer.order.date_html' | t: date: order_date }}</p>
+        {%- if order.cancelled -%}
+          {%- assign cancelled_at = order.cancelled_at | time_tag: format: "date_at_time" -%}
+          <p class="py-2">{{ 'customer.order.cancelled_html' | t: date: cancelled_at }}</p>
+          <p class="py-2">{{ 'customer.order.cancelled_reason' | t: reason: order.cancel_reason_label }}</p>
+        {%- endif -%}
+        
+        <table class="w-full text-center border-collapse customer-table customer-table--order" role="table">
+          <thead class="hidden xl:table-header-group" role="rowgroup">
+            <tr role="row">
+              <th class="border border-silver2 bg-primary py-4 px-6 uppercase text-sm text-silver2 font-normal" id="ColumnProduct" scope="col" role="columnheader">{{ 'customer.order.product' | t }}</th>
+              <th class="border border-silver2 bg-primary py-4 px-6 uppercase text-sm text-silver2 font-normal" id="ColumnSku" scope="col" role="columnheader">{{ 'customer.order.sku' | t }}</th>
+              <th class="border border-silver2 bg-primary py-4 px-6 uppercase text-sm text-silver2 font-normal" id="ColumnPrice" scope="col" role="columnheader">{{ 'customer.order.price' | t }}</th>
+              <th class="border border-silver2 bg-primary py-4 px-6 uppercase text-sm text-silver2 font-normal" id="ColumnQuantity" scope="col" role="columnheader">{{ 'customer.order.quantity' | t }}</th>
+              <th class="border border-silver2 bg-primary py-4 px-6 uppercase text-sm text-silver2 font-normal" id="ColumnTotal" scope="col" role="columnheader">{{ 'customer.order.total' | t }}</th>
+            </tr>
+          </thead>
+          <tbody role="rowgroup">
+            {%- for line_item in order.line_items -%}
+            	<tr role="row" class="flex flex-col -mt-[1px] xl:mt-0 w-full xl:table-row {% unless forloop.last %}mb-8{% endunless %} xl:mb-0 {% if even == 0 %}bg-flash{% endif %}">
+                  <td class="border border-silver2 py-5 px-6 flex xl:table-cell text-right xl:text-center"
+                      id="Row{{ line_item.key }}"
+                      role="cell"
+                      headers="ColumnProduct"
+                      data-label="{{ 'customer.order.product' | t }}"
+                      >
+                    <div>
+                      {%- if line_item.url != blank -%}
+                        <a href="{{ line_item.url }}">{{ line_item.title }}</a>
+                      {%- else -%}
+                        <p>{{ line_item.title }}</p>
+                      {%- endif -%}
+                    </div>
+                    {%- assign property_size = line_item.properties | size -%}
+                    {%- unless line_item.selling_plan_allocation == nil and property_size == 0 -%}
+                      <div>
+						{%- unless line_item.product.has_only_default_variant -%}
+                          <p class="mt-4">
+                            {{ line_item.variant.title }}
+                          </p>
+                        {%- endunless -%}
+                        {%- unless line_item.selling_plan_allocation == nil -%}
+                          <p class="mt-4">
+                            {{ line_item.selling_plan_allocation.selling_plan.name }}
+                          </p>
+                        {%- endunless -%}
+                        {%- if property_size != 0 -%}
+                          {%- for property in line_item.properties -%}
+                            {% assign property_first_char = property.first | slice: 0 %}
+                            {%- if property.last != blank and property_first_char != '_' -%}
+                              <p class="mt-4">
+                                {{ property.first }}:&nbsp;
+                                {%- if property.last contains '/uploads/' -%}
+                                  <a href="{{ property.last }}">{{ property.last | split: '/' | last }}</a>
+                                {%- else -%}
+                                  {{ property.last }}
+                                {%- endif -%}
+                              </p>
+                            {%- endif -%}
+                          {%- endfor -%}
+                        {%- endif -%}
+                      </div>
+                   	{%- endunless -%}
+                    
+                    {%- if line_item.line_level_discount_allocations != blank -%}
+                      <ul role="list" aria-label="{{ 'customer.order.discount' | t }}">
+                        {%- for discount_allocation in line_item.line_level_discount_allocations -%}
+                          <li class="mt-4">
+                            {{ discount_allocation.discount_application.title }} (-{{ discount_allocation.amount | money }})
+                          </li>
+                        {%- endfor -%}
+                      </ul>
+                    {%- endif -%}
+                    
+                    {%- if line_item.fulfillment -%}
+                      <div>
+                        {%- assign created_at = line_item.fulfillment.created_at | time_tag: format: 'date' -%}
+                        <p class="mt-4">{{ 'customer.order.fulfilled_at_html' | t: date: created_at }}</p>
+
+                          {%- if line_item.fulfillment.tracking_url -%}
+                            <p class="mt-4">
+                              <a href="{{ line_item.fulfillment.tracking_url }}">
+                                {{ 'customer.order.track_shipment' | t }}
+                              </a>
+                    		</p>
+                          {%- endif -%}
+                          <p class="mt-4">
+                            {{ line_item.fulfillment.tracking_company }}
+                            {%- if line_item.fulfillment.tracking_number -%} #{{ line_item.fulfillment.tracking_number }} {%- endif -%}
+                          </p>
+                      </div>
+                    {%- endif -%}
+                  </td>
+                  
+                  <td class="border border-silver2 py-5 px-6 uppercase flex xl:table-cell text-right xl:text-center" headers="Row{{ line_item.key }} ColumnSku" role="cell" data-label="{{ 'customer.order.sku' | t }}">
+                    {{ line_item.sku }}
+                  </td>
+                  
+                  <td class="border border-silver2 py-5 px-6 uppercase flex xl:table-cell text-right xl:text-center" headers="Row{{ line_item.key }} ColumnPrice" role="cell" data-label="{{ 'customer.order.price' | t }}">
+                    {{ line_item.final_price | money }}
+                  </td>
+                  
+                  <td class="border border-silver2 py-5 px-6 uppercase flex xl:table-cell text-right xl:text-center" headers="Row{{ line_item.key }} ColumnQuantity" role="cell" data-label="{{ 'customer.order.quantity' | t }}">
+                    x {{ line_item.quantity }}
+                  </td>
+                  
+                  <td class="border border-silver2 py-5 px-6 flex xl:table-cell text-right xl:text-center" headers="Row{{ line_item.key }} ColumnTotal" role="cell" data-label="{{ 'customer.order.total' | t }}">
+                    {{ line_item.final_line_price | money }}
+                  </td>
+            	</tr>
+            {%- endfor -%}
+          </tbody>
+          <tfoot role="rowgroup">
+            <tr role="row" class="flex flex-col w-full xl:table-row mb-0 mt-8 xl:mt-0 {% if even == 0 %}bg-flash{% endif %}">
+              <th class="border border-silver2 py-5 px-6 text-right xl:text-center hidden xl:table-cell"
+                  id="RowSubtotal"
+                  role="cell"
+                  headers="ColumnProduct"
+                  colspan="4"
+                  data-label="{{ 'customer.order.product' | t }}"
+                  >
+                {{ 'customer.order.subtotal' | t }}
+              </th>
+              <td headers="RowSubtotal" class="border border-silver2 py-5 px-6 flex xl:table-cell text-right xl:text-center" role="cell" data-label="{{ 'customer.order.subtotal' | t }}">
+                {{ order.line_items_subtotal_price | money }}
+              </td>
+            </tr>
+            {%- if order.cart_level_discount_applications != blank -%}
+            	<tr role="row" class="flex flex-col -mt-[1px] xl:mt-0 w-full xl:table-row mb-0 {% if even == 0 %}bg-flash{% endif %}">
+                  {%- for discount_application in order.cart_level_discount_applications -%}
+                    <th class="border border-silver2 py-5 px-6 text-right xl:text-center hidden xl:table-cell"
+                        id="RowDiscount"
+                        role="cell"
+                        headers="ColumnProduct"
+                        colspan="4"
+                        data-label="{{ 'customer.order.product' | t }}"
+                        >
+                        {{ 'customer.order.discount' | t }}: {{ discount_application.title }}
+                    </th>
+                    <td headers="RowDiscount" class="border border-silver2 py-5 px-6 flex xl:table-cell text-right xl:text-center" role="cell" data-label="{{ 'customer.order.discount' | t }}">
+                      -{{ discount_application.total_allocated_amount | money }}
+                    </td>
+                  {%- endfor -%}
+            	</tr>
+            {%- endif -%}
+            {%- for shipping_method in order.shipping_methods -%}
+            	<tr role="row" class="flex flex-col -mt-[1px] xl:mt-0 w-full xl:table-row {% if even == 0 %}bg-flash{% endif %}">
+                  <th class="border border-silver2 py-5 px-6 text-right xl:text-center hidden xl:table-cell"
+                      id="RowShipping"
+                      role="cell"
+                      headers="ColumnProduct"
+                      colspan="4"
+                      data-label="{{ 'customer.order.product' | t }}"
+                      >
+                      {{ 'customer.order.shipping' | t }}
+                  </th>
+                  <td headers="RowShipping" class="border border-silver2 py-5 px-6 flex xl:table-cell text-right xl:text-center" role="cell" data-label="{{ 'customer.order.shipping' | t }}">
+                    {{ shipping_method.title }}: {{ shipping_method.price | money }}
+                  </td>
+            	</tr>
+            {%- endfor -%}
+            {%- for tax_line in order.tax_lines -%}
+            	<tr role="row" class="flex flex-col -mt-[1px] xl:mt-0 w-full xl:table-row mb-0 {% if even == 0 %}bg-flash{% endif %}">
+                  <th class="border border-silver2 py-5 px-6 text-right xl:text-center hidden xl:table-cell"
+                      id="RowTax"
+                      role="cell"
+                      headers="ColumnProduct"
+                      colspan="4"
+                      data-label="{{ 'customer.order.product' | t }}"
+                      >
+                      {{ 'customer.order.tax' | t }}
+                  </th>
+                  <td headers="RowTax" class="border border-silver2 py-5 px-6 flex xl:table-cell text-right xl:text-center" role="cell" data-label="{{ 'customer.order.tax' | t }}">
+                    {{ tax_line.title }}: {{ tax_line.price | money }} ({{ tax_line.rate | times: 100 }}%)
+                  </td>
+            	</tr>
+            {%- endfor -%}
+            {%- if order.total_duties -%}
+            	<tr role="row" class="flex flex-col -mt-[1px] xl:mt-0 w-full xl:table-row mb-0 {% if even == 0 %}bg-flash{% endif %}">
+                  <th class="border border-silver2 py-5 px-6 text-right xl:text-center hidden xl:table-cell"
+                      id="RowDuties"
+                      role="cell"
+                      headers="ColumnProduct"
+                      colspan="4"
+                      data-label="{{ 'customer.order.product' | t }}"
+                      >
+                      {{ 'customer.order.total_duties' | t }}
+                  </th>
+                  <td headers="RowDuties" class="border border-silver2 py-5 px-6 flex xl:table-cell text-right xl:text-center" role="cell" data-label="{{ 'customer.order.total_duties' | t }}">
+                    {{ order.total_duties | money }}
+                  </td>
+            	</tr>
+            {%- endif -%}
+             <tr role="row" class="flex flex-col -mt-[1px] xl:mt-0 w-full xl:table-row mb-0 {% if even == 0 %}bg-flash{% endif %}">
+              <th class="border border-silver2 py-5 px-6 text-right xl:text-center hidden xl:table-cell"
+                  id="RowTotal"
+                  role="cell"
+                  headers="ColumnProduct"
+                  colspan="4"
+                  data-label="{{ 'customer.order.product' | t }}"
+                  >
+                {{ 'customer.order.total' | t }}
+              </th>
+              <td headers="RowTotal" class="border border-silver2 py-5 px-6 flex xl:table-cell text-right xl:text-center" role="cell" data-label="{{ 'customer.order.total' | t }}">
+                {{ order.total_price | money_with_currency }}
+              </td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
+    
+    <div class="mt-12">
+      <h2 class="text-lg xl:text-2xl mb-0">{{ 'customer.order.billing_address' | t }}</h2>
+      <div class="mt-6 xl:mt-10 pt-6 xl:pt-10 pb-8 xl:pb-12 px-8 xl:px-12 bg-flash sm:max-w-[26.8rem]">
+        <h4>{{ 'customer.order.payment_status' | t }}: {{ order.financial_status_label }}</h4>
+
+        <div class="mt-6 text-lg">
+          {{ order.billing_address | format_address }}
+        </div>
+      </div>
+      
+      <h2 class="text-lg xl:text-2xl mb-0 mt-8">{{ 'customer.order.shipping_address' | t }}</h2>
+      <div class="mt-6 xl:mt-10 pt-6 xl:pt-10 pb-8 xl:pb-12 px-8 xl:px-12 bg-flash sm:max-w-[26.8rem]">
+        <h4>{{ 'customer.order.fulfillment_status' | t }}: {{ order.fulfillment_status_label }}</h4>
+
+        <div class="mt-6 text-lg">
+          {{ order.shipping_address | format_address }}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

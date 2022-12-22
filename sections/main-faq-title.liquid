@@ -1,0 +1,135 @@
+{%- if section.blocks.size > 0 -%}
+	{%- liquid
+    assign padding_top = section.settings.padding_top | default: 0
+    assign padding_bottom = section.settings.padding_bottom | default: 0
+    assign margin_top = section.settings.margin_top | default: 0
+    assign margin_bottom = section.settings.margin_bottom | default: 0
+    assign heading = section.settings.title | default: title
+    assign subtitle = section.settings.subtitle | escape 
+  -%}
+
+	{%- render 'offset' 
+    id: section.id
+    padding_top: padding_top, 
+    padding_bottom: padding_bottom,
+    margin_top: margin_top,
+    margin_bottom: margin_bottom
+  -%}
+
+	<section id="section-{{ section.id }}">
+    <div class="page-width">
+      <div class="max-w-[91rem] mx-auto">
+        {%- if heading != blank -%}
+          <h1 class="styled-span text-2xl xl:text-5xl text-center">{{ heading }}</h1>
+        {%- endif -%}
+        
+        {%- if subtitle != blank -%}
+          <p class="hidden xl:block text-lg tracking-normal mt-5 text-center">{{ subtitle }}</p>
+        {%- endif -%}
+        
+        <ul class="grid
+              grid-cols-autofit
+              gap-4
+              mt-12
+              xl:mt-24">
+          {%- for block in section.blocks -%}
+            {%- liquid
+              assign btn_label = block.settings.title | escape
+              assign btn_link = btn_label | handleize | prepend: '#'
+              assign icon = block.settings.icon
+            -%}
+            {%- if btn_label != blank -%}
+              <li>
+                <a class="flex
+                    items-center
+                    justify-center
+                    xl:block
+                    p-5
+                    text-center
+                    bg-flash" href="{{ btn_link }}">
+                  {%- if icon != blank -%}
+                    <div class="flex justify-center items-center mr-2 xl:mr-0 xl:mb-4">
+                        <span class="flex 
+                          justify-center 
+                          items-center
+                          w-[3.2rem]
+                          h-[3.2rem]
+                          ">
+                          {{ icon }}
+                        </span>
+                    </div>
+                  {%- endif -%}
+                  <p class="uppercase">{{ btn_label }}</p>
+                </a>
+              </li>
+            {%- endif -%}
+          {%- endfor -%}
+        </ul>
+      </div>
+    </div>
+	</section>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "FAQ Title",
+  "settings": [
+	{
+      "type": "number",
+      "id": "padding_top",
+      "label": "Padding top (rem)",
+      "default": 0,
+      "info": "1rem = 10px"
+    },
+    {
+      "type": "number",
+      "id": "padding_bottom",
+      "label": "Padding bottom (rem)",
+      "default": 0,
+      "info": "1rem = 10px"
+    },
+    {
+      "type": "number",
+      "id": "margin_top",
+      "label": "Margin top (rem)",
+      "default": 100,
+      "info": "1rem = 10px"
+    },
+    {
+      "type": "number",
+      "id": "margin_bottom",
+      "label": "Margin bottom (rem)",
+      "default": 100,
+      "info": "1rem = 10px"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Title"
+    },
+	{
+      "type": "text",
+      "id": "subtitle",
+      "label": "Subtitle"
+    }
+  ],
+  "blocks": [
+    {
+    "type": "button",
+    "name": "Button",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title"
+        },
+        {
+          "type": "html",
+          "id": "icon",
+          "label": "SVG icon"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

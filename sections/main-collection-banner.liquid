@@ -1,0 +1,125 @@
+{%- liquid
+  assign disable_featured_image = collection.metafields.collection.disable_featured_image | default: false
+  assign featured_image = collection.image 
+  assign video_url = section.settings.video_url | escape
+  assign heading = section.settings.title | default: collection.title
+  assign subtitle = section.settings.subtitle | escape | default: collection.description | strip_html
+-%}
+
+<div class="relative 
+  h-[45rem] 
+  flex 
+  items-center 
+  justify-center">
+
+  {%- if heading != blank -%}
+    <div class="max-w-screen-lg w-full mx-auto">
+      <h2 class="max-w-[90%] 
+        mx-auto 
+        text-center
+        text-inverted
+        text-6xl
+        mb-0
+        xl:text-9xl
+        styled-span">
+        {{ heading }}
+      </h2>
+
+      {%- if subtitle != blank -%}
+        <p class="mt-1
+          xl:mt-4
+          font-bold
+          text-inverted
+          text-1xl
+          xl:text-3xl
+          text-center
+          max-w-[90%]
+          mx-auto">{{ subtitle }}</p>
+      {%- endif -%}
+
+      {%- if section.blocks.size > 0 -%}
+        <ul class="
+          px-8
+          grid 
+          grid-cols-autofit-10
+          gap-4
+          mt-6
+          xl:mt-9">
+          {%- for block in section.blocks -%}
+              {%- liquid
+                  assign button_label = block.settings.title | escape
+                  assign button_label_mobile = button_label | split: ' ' | first
+                  assign button_link = block.settings.button_link
+              -%}
+              {%- if button_label != blank
+                  and button_link != blank -%}
+                  <li>
+                        <a href="{{ button_link }}" class="btn btn--secondary btn--inverted w-full !px-6">
+                            <span class="hidden xl:inline">
+                                {{ button_label }}
+                            </span>
+
+                            <span class="xl:hidden">
+                                {{ button_label_mobile }}
+                            </span>
+                        </a>
+                  </li>
+              {%- endif -%} 
+          {%- endfor -%}
+        </ul>
+      {%- endif -%}
+    </div>
+  {%- endif -%}
+
+  {%- if disable_featured_image == false
+    and featured_image -%}
+    {%- render 'img', image: featured_image -%}
+  {%- else -%}
+    {%- if video_url != blank -%}
+        {%- render 'video', video_url: video_url -%}
+    {%- endif -%}
+  {%- endif -%}
+</div>
+
+{% schema %}
+{
+  "name": "t:sections.main-collection-banner.name",
+  "class": "section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Title"
+    },
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Subtitle"
+    },
+    {
+      "type": "text",
+      "id": "video_url",
+      "label": "Background video URL",
+      "info": "Upload a video in the mp4 format under Settings -> Files, then copy and paste its URL here."
+    }
+  ],
+  "blocks": [
+    {
+      "type": "button",
+      "name": "button",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Button label"
+        },
+        {
+          "type": "url",
+          "id": "button_link",
+          "label": "Button link"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

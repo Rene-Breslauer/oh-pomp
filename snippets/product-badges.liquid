@@ -1,0 +1,23 @@
+<ul class="flex 
+    items-center
+    absolute
+    z-20
+    left-4
+    top-4">
+    {%- liquid
+        assign price = product.selected_or_first_available_variant.price
+        assign compare_at_price = product.selected_or_first_available_variant.compare_at_price
+        assign price_decimals = product.selected_or_first_available_variant.price | times: 1.00
+        assign compare_at_price_decimals = product.selected_or_first_available_variant.compare_at_price | times: 1.00
+        assign percent = false
+        if compare_at_price
+            assign percent = compare_at_price_decimals | minus: price_decimals | divided_by: compare_at_price_decimals | times: 100 | round | append: '% OFF'
+        endif
+    -%}
+
+    {%- if compare_at_price > 0 and percent -%}
+        <li class="mr-2 bg-white rounded-[1.2rem] py-2 px-4 uppercase leading-none">
+            {{ percent }}
+        </li>
+    {%- endif -%}
+</ul>

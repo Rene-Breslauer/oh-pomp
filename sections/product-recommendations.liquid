@@ -1,0 +1,295 @@
+{{ 'slider.css' | asset_url | stylesheet_tag }}
+
+{%- liquid
+  assign padding_top = section.settings.padding_top | default: 0
+  assign padding_bottom = section.settings.padding_bottom | default: 0
+  assign margin_top = section.settings.margin_top | default: 0
+  assign margin_bottom = section.settings.margin_bottom | default: 0
+  assign limit = section.settings.limit
+  assign heading = section.settings.heading
+  assign col = section.settings.collection
+  assign hide_on_mobile = section.settings.hide_on_mobile
+  assign cart_template = false
+  if template contains 'cart'
+	assign cart_template = true
+  endif
+-%}
+
+{%- render 'offset' 
+  id: section.id
+  padding_top: padding_top,
+  padding_bottom: padding_bottom,
+  margin_top: margin_top,
+  margin_bottom: margin_bottom -%}
+
+<section id="section-{{ section.id }}" class="{% if hide_on_mobile %}hidden xl:block{% endif %}">
+  {%- if heading != blank -%}
+    <div class="page-width">
+      <h2 class="{% unless cart_template %}text-center w-3/4 mx-auto{% endunless %} styled-span">{{ heading }}</h2>
+    </div>
+  {%- endif -%}
+
+  {%- if cart_template -%}
+    <div class="page-width">
+      <div class="xl:grid
+                      xl:grid-cols-cart
+                      xl:gap-20">
+      {%- else -%}
+        <div class="page-width">
+        {%- endif -%}
+
+        <div class="mt-11 xl:mt-16">
+          {%- case section.settings.product_recommendations_type -%}
+            {%- when 'dynamic' -%}
+            <product-recommendations data-url="{{ routes.product_recommendations_url }}?section_id={{ section.id }}&product_id={{ product.id }}&limit={{ limit }}">
+              {% if recommendations.performed and recommendations.products_count > 0 %}
+                <div
+                  id="products-slider-{{ section.id }}"
+                  class="splide"
+                  aria-label="Recommendation products slider">
+                  <div class="splide__arrows splide__arrows--products">
+                    <button class="splide__arrow splide__arrow--prev">
+                      {%- render 'icon-prev' -%}
+                    </button>
+                    <button class="splide__arrow splide__arrow--next">
+                      {%- render 'icon-next' -%}
+                    </button>
+                  </div>
+
+                  <div class="splide__track">
+                    <ul class="splide__list">
+                      {% for recommendation in recommendations.products %}
+                        <li class="splide__slide">
+                          {%- render 'product-card-quick-add' product_card_product: recommendation -%}
+                        </li>
+                      {% endfor %}
+                    </ul>
+                  </div>
+
+                  <ul class="splide__pagination"></ul>
+                </div>
+              {% endif %}
+            </product-recommendations>
+
+            <script>
+              class ProductRecommendations extends HTMLElement {
+                constructor() {
+                  super();
+
+                  const handleIntersection = (entries, observer) => {
+                    if (!entries[0].isIntersecting) 
+                      return;
+                    
+
+                    observer.unobserve(this);
+
+                    fetch(this.dataset.url).then(response => response.text()).then(text => {
+                      const html = document.createElement('div');
+                      html.innerHTML = text;
+                      const recommendations = html.querySelector('product-recommendations');
+                      if (recommendations && recommendations.innerHTML.trim().length) {
+                        this.innerHTML = recommendations.innerHTML;
+                        let slider_selector = '#products-slider-' + '{{ section.id }}'
+                        let perPage = '{{ cart_template }}' == 'true'
+                          ? 4
+                          : 5
+                        let padding = '{{ cart_template }}' == 'true'
+                          ? '0'
+                          : '5rem'
+                        new Splide(slider_selector, {
+                          perPage: perPage,
+                          perMove: 1,
+                          padding: 0,
+                          type: 'loop',
+                          gap: 2,
+                          arrows: true,
+                          pagination: true,
+                          breakpoints: {
+                            1535: {
+                              perPage: 4
+                            },
+                            1279: {
+                              perPage: 5
+                            },
+                            1023: {
+                              perPage: 4
+                            },
+                            767: {
+                              perPage: 3
+                            },
+                            639: {
+                              perPage: 2
+                            }
+                          }
+                        }).mount()
+                      }
+                    }).catch(e => {
+                      console.error(e);
+                    });
+                  }
+
+                  new IntersectionObserver(handleIntersection.bind(this), {rootMargin: '0px 0px 200px 0px'}).observe(this);
+                }
+              }
+
+              customElements.define('product-recommendations', ProductRecommendations);
+            </script>
+            {%- when 'collection' -%}
+            {%- if col != blank -%}
+              {%- assign col = collections[col] -%}
+              {%- if col.products_count > 5 -%}
+                <div
+                  id="products-slider-{{ section.id }}"
+                  class="splide"
+                  aria-label="{{ store.name }} products slider">
+                  <div class="splide__arrows splide__arrows--products">
+                    <button class="splide__arrow splide__arrow--prev">
+                      {%- render 'icon-prev' -%}
+                    </button>
+                    <button class="splide__arrow splide__arrow--next">
+                      {%- render 'icon-next' -%}
+                    </button>
+                  </div>
+
+                  <div class="splide__track">
+                    <ul class="splide__list">
+                      {%- for prod in col.products limit: limit -%}
+                        <li class="splide__slide">
+                          {%- render 'product-card-quick-add' product_card_product: prod -%}
+                        </li>
+                      {%- endfor -%}
+                    </ul>
+                  </div>
+
+                  <ul class="splide__pagination"></ul>
+                </div>
+
+                <script>
+                  document.addEventListener('DOMContentLoaded', () => {
+                    let slider_selector = '#products-slider-' + '{{ section.id }}'
+                    let perPage = '{{ cart_template }}' == 'true'
+                      ? 4
+                      : 5
+                    let padding = '{{ cart_template }}' == 'true'
+                      ? '0'
+                      : '5rem'
+                    new Splide(slider_selector, {
+                      perPage: perPage,
+                      perMove: 1,
+                      padding: 0,
+                      type: 'loop',
+                      gap: 2,
+                      arrows: true,
+                      pagination: true,
+                      breakpoints: {
+                        1535: {
+                          perPage: 4
+                        },
+                        1279: {
+                          perPage: 5
+                        },
+                        1023: {
+                          perPage: 4
+                        },
+                        767: {
+                          perPage: 3
+                        },
+                        639: {
+                          perPage: 2
+                        }
+                      }
+                    }).mount()
+                  })
+                </script>
+              {%- endif -%}
+            {%- endif -%}
+          {%- endcase -%}
+        </div>
+
+        {%- if cart_template -%}
+          <div></div>
+        </div>
+      </div>
+  {%- else -%}
+    </div>
+  {%- endif -%}
+</section>
+
+{% schema %}
+  {
+    "name": "t:sections.product-recommendations.name",
+    "tag": "section",
+    "class": "spaced-section",
+    "settings": [
+      {
+        "type": "number",
+        "id": "padding_top",
+        "label": "Padding top (rem)",
+        "default": 0,
+        "info": "1rem = 10px"
+      },
+      {
+        "type": "number",
+        "id": "padding_bottom",
+        "label": "Padding bottom (rem)",
+        "default": 0,
+        "info": "1rem = 10px"
+      },
+      {
+        "type": "number",
+        "id": "margin_top",
+        "label": "Margin top (rem)",
+        "default": 100,
+        "info": "1rem = 10px"
+      },
+      {
+        "type": "number",
+        "id": "margin_bottom",
+        "label": "Margin bottom (rem)",
+        "default": 100,
+        "info": "1rem = 10px"
+      }, {
+        "type": "checkbox",
+        "id": "hide_on_mobile",
+        "label": "Hide on mobile"
+      }, {
+        "type": "radio",
+        "id": "product_recommendations_type",
+        "label": "Product recommendations type",
+        "options": [
+          {
+            "value": "dynamic",
+            "label": "Dynamic"
+          }, {
+            "value": "collection",
+            "label": "Collection"
+          }
+        ],
+        "default": "dynamic"
+      }, {
+        "type": "text",
+        "id": "heading",
+        "default": "You may also like",
+        "label": "t:sections.product-recommendations.settings.heading.label"
+      }, {
+        "type": "collection",
+        "id": "collection",
+        "label": "Collection",
+        "info": "For the Collection product recommendations type"
+      }, {
+        "type": "range",
+        "min": 6,
+        "max": 20,
+        "step": 2,
+        "default": 10,
+        "id": "limit",
+        "label": "Number of products"
+      }
+    ],
+    "presets": [
+      {
+        "name": "Product recommendations"
+      }
+    ]
+  }
+{% endschema %}

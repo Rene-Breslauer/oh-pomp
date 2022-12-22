@@ -1,0 +1,191 @@
+{%- if section.settings.instant_token_url != blank -%}
+
+  {%- liquid
+      assign padding_top = section.settings.padding_top | default: 0
+      assign padding_bottom = section.settings.padding_bottom | default: 0
+      assign margin_top = section.settings.margin_top | default: 0
+      assign margin_bottom = section.settings.margin_bottom | default: 0
+      assign heading = section.settings.title
+      assign subtitle = section.settings.subtitle | escape
+      assign note = section.settings.note | escape
+      assign instant_token_url = section.settings.instant_token_url | escape
+      assign limit = section.settings.limit
+  -%}
+
+  <script src="{{ instant_token_url }}"></script>
+  {{ 'instafeed.min.js' | asset_url | script_tag }}
+
+  {%- render 'offset' 
+      id: section.id
+      padding_top: padding_top, 
+      padding_bottom: padding_bottom,
+      margin_top: margin_top,
+      margin_bottom: margin_bottom
+  -%}
+
+  <section id="section-{{ section.id }}">
+      <div class="page-width">
+          {%- if heading != blank -%}
+            <h2 class="max-w-3xl 
+                mx-auto
+                text-center
+                mb-0 
+                styled-span">{{ heading }}</h2>
+          {%- endif -%}
+
+          {%- if subtitle != blank -%}
+              <p class="mt-1
+                  xl:mt-4
+                  text-1xl 
+                  xl:text-3xl 
+                  font-bold 
+                  text-center">{{ subtitle }}</p>
+          {%- endif -%}
+      </div>
+
+      <div class="mt-11 xl:mt-16">
+        <div id="instafeed-slider-{{ section.id }}" class="splide" aria-label="{{ store.name }} instafeed slider">
+          <div class="splide__arrows">
+            <button class="splide__arrow splide__arrow--prev">
+              {%- render 'icon-prev' -%}
+            </button>
+            <button class="splide__arrow splide__arrow--next">
+              {%- render 'icon-next' -%}
+            </button> 
+          </div>
+
+          <div class="splide__track">
+            <ul id="instafeed" class="splide__list"></ul>  
+          </div>
+
+          <ul class="splide__pagination"></ul>
+        </div>
+      </div>
+    
+      {%- if note != blank -%}
+        <div class="page-width">
+          <p class="text-sm
+                    uppercase
+                    text-silver
+                    text-center
+                    mt-16">{{ note }}</p>
+        </div>
+      {%- endif -%}
+  </section>
+
+  <script type="text/javascript">
+    document.addEventListener('DOMContentLoaded', () => {
+      var feed = new Instafeed({
+      accessToken: InstagramToken,
+      limit: parseInt({{ limit }}),
+      template: '<li class="splide__slide"><a href="{!!!link!!!}" class="relative block w-full h-[25rem] xl:h-[52rem] overflow-hidden" target="_blank"><img class="absolute z-[-1] top-0 bottom-0 left-0 right-0 w-full h-full object-cover object-center" width="359" height="520" title="{!!!caption!!!}" src="{!!!image!!!}" loading="lazy" alt="{!!!caption!!!}"></a></li>',
+      templateBoundaries: ["{!!!", "!!!}"],
+      after: function() {
+        let instafeed_slider_selector = '#instafeed-slider-' + '{{ section.id }}'
+        new Splide( instafeed_slider_selector, {
+          perPage: 5,
+          perMove: 1,
+          padding: '5rem',
+          type: 'loop',
+          gap: 2,
+          arrows: true,
+          pagination: true,
+          breakpoints: {
+            1535: {
+              perPage: 4,
+            },
+            1279: {
+              perPage: 5,
+            },
+            1023: {
+              perPage: 4,
+            },
+            767: {
+              perPage: 3,
+              padding: '2rem',
+            },
+            639: {
+              perPage: 2,
+              padding: '2rem',
+            },
+          }
+        } ).mount()
+      }
+    })
+
+    feed.run()
+    })
+  </script>
+
+{%- endif -%}
+
+{% schema %}
+{
+	"name":"Instafeed",
+	"settings":[
+        {
+          "type": "number",
+          "id": "padding_top",
+          "label": "Padding top (rem)",
+          "default": 0,
+          "info": "1rem = 10px"
+        },
+        {
+          "type": "number",
+          "id": "padding_bottom",
+          "label": "Padding bottom (rem)",
+          "default": 0,
+          "info": "1rem = 10px"
+        },
+        {
+          "type": "number",
+          "id": "margin_top",
+          "label": "Margin top (rem)",
+          "default": 100,
+          "info": "1rem = 10px"
+        },
+        {
+          "type": "number",
+          "id": "margin_bottom",
+          "label": "Margin bottom (rem)",
+          "default": 100,
+          "info": "1rem = 10px"
+        },
+		{
+			"type": "text",
+			"id": "title",
+			"label": "Title"
+		},
+		{
+			"type": "text",
+			"id": "subtitle",
+			"label": "Subtitle"
+		},
+		{
+			"type": "text",
+			"id": "instant_token_url",
+			"label": "Instant token URL",
+			"info": "Example: https://ig.instant-tokens.com/users/1e2f39b2-9300-4bdc-a8a9-2ec71998b6b3/instagram/17841402230419214/token.js?userSecret=hp0ql3umgxp9a5hejh5j"
+		},
+		{
+			"type": "range",
+			"min": 6,
+			"max": 20,
+			"step": 2,
+			"default": 10,
+			"id": "limit",
+			"label": "Number of posts"
+		},
+        {
+			"type": "text",
+			"id": "note",
+			"label": "Note"
+		}
+	],
+	"presets":[
+		{
+			"name": "Instafeed"
+		}
+	]
+}
+{% endschema %}

@@ -1,0 +1,171 @@
+{%- if section.settings.title != blank
+	and section.settings.video_bg_url != blank -%}
+    {%- liquid
+        assign padding_top = section.settings.padding_top | default: 0
+        assign padding_bottom = section.settings.padding_bottom | default: 0
+        assign margin_top = section.settings.margin_top | default: 0
+        assign margin_bottom = section.settings.margin_bottom | default: 0
+        assign heading = section.settings.title
+        assign video_bg_url = section.settings.video_bg_url
+        assign klaviyo_form = section.settings.klaviyo_form
+        assign logo = section.settings.logo
+        assign current_year = "now" | date: "%Y"
+        assign copyright = section.settings.copyright | escape | prepend: ' ' | prepend: current_year | prepend: '&copy; '
+    -%}
+
+    {%- render 'offset' 
+        id: section.id
+        padding_top: padding_top, 
+        padding_bottom: padding_bottom,
+        margin_top: margin_top,
+        margin_bottom: margin_bottom
+    -%}
+
+    <section id="section-{{ section.id }}">
+      	<div class="relative">
+          <div class="absolute
+            w-full
+            h-full
+            left-0
+            right-0
+            top-0
+            bottom-0
+            bg-black/[.35]"></div>
+
+          <div class="relative video-wrapper">
+              {%- render 'video', video_url: video_bg_url -%}
+          </div>
+          
+          <div class="absolute 
+               w-full 
+               h-full
+               left-0 
+               right-0 
+               bottom-0 
+               top-0
+               z-10
+               grid
+               grid-rows-[auto_1fr_auto]
+               grid-cols-[100%]">
+            {%- if logo != blank -%}
+              <header class="flex items-center justify-center page-width py-12">
+                  {{ logo }}
+              </header>
+            {%- endif -%}
+            
+            <main class="flex items-center justify-center page-width">
+            	<div class="max-w-[109.4rem]">
+                    {%- if heading != blank -%}
+                        <h1 class="text-white
+                            mb-8 
+                            xl:mb-16 
+                            text-6xl
+                            xl:text-9xl 
+                            styled-span 
+                            text-center">{{ heading }}</h1>
+                    {%- endif -%}
+
+                    {%- if klaviyo_form != blank -%}
+                        <div class="klaviyo-form-wrapper max-w-[45.6rem] mx-auto">
+                            {{ klaviyo_form }}
+                        </div>
+                    {%- endif -%}
+                </div>
+            </main>
+            
+            {%- if copyright != blank -%}
+              <footer class="flex items-center justify-center page-width py-12 text-center text-sm text-white uppercase">
+				{{ copyright }}
+              </footer>
+            {%- endif -%}
+          </div>
+        </div>
+    </section>
+{%- endif -%}
+
+{% stylesheet %}
+    .klaviyo-form-wrapper button {
+        transition: all .15s linear;
+        letter-spacing: .06em !important;
+    }
+
+    .klaviyo-form-wrapper button:hover {
+        box-shadow: 0 0 0 3px var(--theme-base-color);
+    }
+
+    .video-wrapper {
+        min-height: 80rem;
+    }
+    
+    @media only screen and (min-width: 1280px) {
+        padding-bottom: 56.25%;
+        height: 0;
+        min-height: initial;
+    }
+{% endstylesheet %}
+
+{% schema %}
+{
+	"name":"Welcome Landing",
+	"settings":[
+        {
+            "type": "number",
+            "id": "padding_top",
+            "label": "Padding top (rem)",
+            "default": 0,
+            "info": "1rem = 10px"
+        },
+        {
+            "type": "number",
+            "id": "padding_bottom",
+            "label": "Padding bottom (rem)",
+            "default": 0,
+            "info": "1rem = 10px"
+        },
+        {
+            "type": "number",
+            "id": "margin_top",
+            "label": "Margin top (rem)",
+            "default": 100,
+            "info": "1rem = 10px"
+        },
+        {
+            "type": "number",
+            "id": "margin_bottom",
+            "label": "Margin bottom (rem)",
+            "default": 100,
+            "info": "1rem = 10px"
+        },
+		{
+			"type": "text",
+			"id": "title",
+			"label": "Title"
+		},
+        {
+			"type": "html",
+			"id": "logo",
+			"label": "Logo (SVG)"
+		},
+        {
+			"type": "html",
+			"id": "klaviyo_form",
+			"label": "Klaviyo form code"
+		},
+        {
+			"type": "text",
+			"id": "copyright",
+			"label": "Copyright"
+		},
+        {
+			"type": "text",
+			"id": "video_bg_url",
+			"label": "Video URL"
+		}
+	],
+	"presets":[
+		{
+			"name": "Welcome Landing"
+		}
+	]
+}
+{% endschema %}

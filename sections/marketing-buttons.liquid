@@ -1,0 +1,149 @@
+{%- if section.blocks.size > 0 -%}
+
+    {%- liquid
+        assign padding_top = section.settings.padding_top | default: 0
+        assign padding_bottom = section.settings.padding_bottom | default: 0
+        assign margin_top = section.settings.margin_top | default: 0
+        assign margin_bottom = section.settings.margin_bottom | default: 0
+        assign heading = section.settings.title
+        assign subtitle = section.settings.subtitle | escape
+        assign note = section.settings.note | escape   
+    -%}
+
+    {%- render 'offset' 
+        id: section.id
+        padding_top: padding_top, 
+        padding_bottom: padding_bottom,
+        margin_top: margin_top,
+        margin_bottom: margin_bottom
+    -%}
+
+    <section id="section-{{ section.id }}">
+        <div class="page-width">
+            <div class="max-w-[91rem] mx-auto">
+                {%- if heading != blank -%}
+                    <h2 class="max-w-3xl 
+                        mx-auto 
+                        text-center
+                        text-5xl
+                        mb-0
+                        xl:text-6xl
+                        styled-span">{{ heading }}</h2>
+                {%- endif -%}
+
+                {%- if subtitle != blank -%}
+                    <p class="text-1xl
+                        xl:text-3xl 
+                        font-bold 
+                        text-center
+                        mt-3
+                        xl:mt-5">{{ subtitle }}</p>
+                {%- endif -%}
+
+                <ul class="grid 
+                    grid-cols-autofit
+                    gap-4
+                    mt-5
+                    xl:mt-8">
+                    {%- for block in section.blocks -%}
+                        {%- liquid
+                            assign button_label = block.settings.title | escape
+                            assign button_link = block.settings.button_link
+                        -%}
+                        {%- if button_label != blank
+                            and button_link != blank -%}
+                            <li>
+                                <a href="{{ button_link }}" class="btn btn--secondary btn--inverted w-full !px-3">{{ button_label }}</a>
+                            </li>
+                        {%- endif -%} 
+                    {%- endfor -%}
+                </ul>
+
+                {%- if note != blank -%}
+                    <p class="text-sm
+                        text-silver
+                        uppercase  
+                        text-center
+                        mt-8">{{ note }}</p>
+                {%- endif -%}
+            </div>
+        </div>
+    </section>
+
+{%- endif -%}
+
+
+{% schema %}
+    {
+        "name": "Marketing buttons",
+        "max_blocks": 4,
+        "settings": [
+            {
+                "type": "number",
+                "id": "padding_top",
+                "label": "Padding top (rem)",
+                "default": 0,
+                "info": "1rem = 10px"
+            },
+            {
+                "type": "number",
+                "id": "padding_bottom",
+                "label": "Padding bottom (rem)",
+                "default": 0,
+                "info": "1rem = 10px"
+            },
+            {
+                "type": "number",
+                "id": "margin_top",
+                "label": "Margin top (rem)",
+                "default": 100,
+                "info": "1rem = 10px"
+            },
+            {
+                "type": "number",
+                "id": "margin_bottom",
+                "label": "Margin bottom (rem)",
+                "default": 100,
+                "info": "1rem = 10px"
+            },
+            {
+                "type": "text",
+                "id": "title",
+                "label": "Title"
+            },
+            {
+                "type": "text",
+                "id": "subtitle",
+                "label": "Subtitle"
+            },
+            {
+                "type": "text",
+                "id": "note",
+                "label": "Note"
+            }
+        ],
+        "blocks": [
+            {
+                "type": "button",
+                "name": "button",
+                "settings": [
+                    {
+                        "type": "text",
+                        "id": "title",
+                        "label": "Button label"
+                    },
+                    {
+                        "type": "url",
+                        "id": "button_link",
+                        "label": "Button link"
+                    }
+                ]
+            }
+        ],
+        "presets":[
+            {
+                "name": "Marketing buttons"
+            }
+        ]
+    }
+{% endschema %}

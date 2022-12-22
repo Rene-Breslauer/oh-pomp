@@ -1,0 +1,284 @@
+{%- if section.settings.title != blank -%}
+	{%- liquid
+        assign padding_top = section.settings.padding_top | default: 0
+        assign padding_bottom = section.settings.padding_bottom | default: 0
+        assign margin_top = section.settings.margin_top | default: 0
+        assign margin_bottom = section.settings.margin_bottom | default: 0
+        assign heading = section.settings.title
+        assign subtitle = section.settings.subtitle | escape
+        assign title_footer = section.settings.title_footer | escape
+        assign button_label = section.settings.button_label | escape
+        assign button_link = section.settings.button_link
+    -%}
+
+	{%- render 'offset' 
+        id: section.id
+        padding_top: padding_top, 
+        padding_bottom: padding_bottom,
+        margin_top: margin_top,
+        margin_bottom: margin_bottom
+    -%}
+	
+    <section id="section-{{ section.id }}">
+        <div class="page-width">
+          <div class="max-w-[90rem] mx-auto">
+
+            <h1 class="text-2xl 
+			  	xl:text-5xl
+                text-center
+				styled-span">{{ heading }}</h1>
+            
+            {%- if subtitle != blank -%}
+                <p class="mt-6 text-lg tracking-normal text-center">{{ subtitle }}</p>
+            {%- endif -%}
+
+            {%- if section.blocks.size > 0 -%}
+			  	{%- assign tab_width = 100.00 | divided_by: section.blocks.size | append: '%' -%}
+				<style>
+					@media only screen and (min-width: 1280px) {
+						.tab-button-wrapper {
+							width:{{ tab_width }};
+						}
+					}
+				</style>
+			  	<div class="mt-8 xl:mt-24">
+				  	<ul class="p-1.5 
+					  	bg-flash
+						  rounded-[1.9rem]
+						  max-w-[75rem]
+                          mx-auto
+						  xl:flex
+						  xl:items-center
+						  xl:justify-between">
+						{%- for block in section.blocks -%}
+							{%- liquid
+								assign title = block.settings.title | escape
+								assign content = pages[block.settings.page].content
+							-%}
+							{%- if title != blank
+								and content != blank -%}
+								<li class="tab-button-wrapper {% if forloop.first %}active{% endif %}">
+									<button class="tab-button
+										border
+										border-transparent
+										bg-transparent
+										rounded-[1.9rem]
+										text-center
+										uppercase
+										w-full
+										py-2.5
+										px-4
+										relative
+										hover:opacity-70
+										{% unless forloop.first %}
+											after:content-['']
+											after:absolute
+											after:block
+											after:h-[1px]
+											xl:after:h-3
+											after:w-[calc(100%_-_4rem)]
+											xl:after:w-[1px]
+											after:bg-silver2
+											after:z-20
+											after:left-1/2
+											xl:after:left-0
+											after:top-0
+											xl:after:top-1/2
+											after:transform
+											after:-translate-x-1/2
+											xl:after:-translate-x-0
+											xl:after:-translate-y-1/2
+										{% endunless %}"
+										data-id="content-{{ forloop.index }}">
+										{{ title }}
+									</button>
+								</li>
+							{%- endif -%}
+						{%- endfor -%} 
+					</ul>
+					 
+					<div class="mt-8">
+						{%- for block in section.blocks -%}
+							{%- liquid
+								assign title = block.settings.title | escape
+								assign content = pages[block.settings.page].content
+							-%}
+							{%- if title != blank
+								and content != blank -%}
+								<div id="content-{{ forloop.index }}" class="{% unless forloop.first %}hidden{% endunless %} tab-content rte">
+									{{ content }}
+								</div>
+							{%- endif -%}
+						{%- endfor -%}
+					</div>
+
+					<script>
+						window.addEventListener('DOMContentLoaded', (event) => {
+							const tab_button_wrappers = document.querySelectorAll('.tab-button-wrapper')
+							const tab_contents = document.querySelectorAll('.tab-content')
+							if (tab_button_wrappers) {
+								tab_button_wrappers.forEach((tab_button_wrapper) => {
+									const tab_button = tab_button_wrapper.querySelector('button')
+									const tab_content_id = tab_button.getAttribute('data-id')
+									if (tab_button) {
+										tab_button.addEventListener('click', () => {
+											event.preventDefault()
+
+											tab_button_wrappers.forEach((_tab_button_wrapper) => {
+												_tab_button_wrapper.classList.remove('active')
+											})
+
+											if (tab_contents) {
+												tab_contents.forEach((tab_content) => {
+													tab_content.classList.add('hidden')
+												})
+											}
+
+											tab_button_wrapper.classList.add('active')
+
+											const tab_content = document.getElementById(tab_content_id)
+											if (tab_content) {
+												tab_content.classList.remove('hidden')
+											}
+										})
+									}
+								})
+							}
+						})
+					</script>
+				</div>
+			  {%- endif -%}
+
+                <div class="mt-10 xl:mt-24 max-w-[60rem] mx-auto">
+                    <div class="flex items-center justify-center">
+                        {%- for i in (1..3) -%}
+                            {%- capture icon_index -%}icon_{{ i }}{%- endcapture -%}
+                            {%- assign icon = section.settings[icon_index] -%}
+                            {%- if icon -%}
+                                <div class="flex mx-6">
+                                    {{ icon }}
+                                </div>
+                            {%- endif -%}
+                        {%- endfor -%}
+                    </div>
+                  	
+                  	{%- if title_footer != blank -%}
+                  		<p class="font-bold 
+                            text-1xl 
+                            xl:text-3xl 
+                            text-center 
+                            mt-4 
+                            xl:mt-8
+                            tracking-normal">{{ title_footer }}</p>
+                  	{%- endif -%}
+                  
+                  	{%- if button_label != blank
+                    	and button_link != blank -%}
+                  		<div class="text-center mt-6 xl:10">
+                          <a href="{{ button_link }}" class="btn">{{ button_label }}</a>
+                 		</div>
+                  	{%- endif -%}
+                </div>
+            </div>
+        </div>
+    </section>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Size Guide",
+  "settings": [
+	{
+      "type": "number",
+      "id": "padding_top",
+      "label": "Padding top (rem)",
+      "default": 0,
+      "info": "1rem = 10px"
+    },
+    {
+      "type": "number",
+      "id": "padding_bottom",
+      "label": "Padding bottom (rem)",
+      "default": 0,
+      "info": "1rem = 10px"
+    },
+    {
+      "type": "number",
+      "id": "margin_top",
+      "label": "Margin top (rem)",
+      "default": 100,
+      "info": "1rem = 10px"
+    },
+    {
+      "type": "number",
+      "id": "margin_bottom",
+      "label": "Margin bottom (rem)",
+      "default": 100,
+      "info": "1rem = 10px"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Title"
+    },
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Subtitle"
+    },
+    {
+      "type": "html",
+      "id": "icon_1",
+      "label": "Icon 1"
+    },
+    {
+      "type": "html",
+      "id": "icon_2",
+      "label": "Icon 2"
+    },
+    {
+      "type": "html",
+      "id": "icon_3",
+      "label": "Icon 3"
+    },
+	{
+      "type": "text",
+      "id": "title_footer",
+      "label": "Title footer"
+    },
+	{
+      "type": "text",
+      "id": "button_label",
+      "label": "Button label"
+    },
+	{
+      "type": "text",
+      "id": "button_link",
+      "label": "Button link"
+    }
+  ],
+  "blocks": [
+    {
+    "type": "tab",
+    "name": "tab",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title"
+        },
+        {
+          "type": "page",
+          "id": "page",
+          "label": "Page"
+        }
+      ]
+    }
+  ],
+  "presets":[
+    {
+    	"name": "Size Guide"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,560 @@
+{%- if section.settings.title != blank -%}
+    {%- liquid
+        assign padding_top = section.settings.padding_top | default: 0
+        assign padding_bottom = section.settings.padding_bottom | default: 0
+        assign margin_top = section.settings.margin_top | default: 0
+        assign margin_bottom = section.settings.margin_bottom | default: 0
+        assign heading = section.settings.title
+        assign subtitle = section.settings.subtitle | escape
+        assign form_title = section.settings.form_title
+        assign form_subtitle = section.settings.form_subtitle | escape
+        assign location_title = section.settings.location_title | escape
+        assign address = section.settings.address | escape
+        assign button_label = section.settings.button_label | escape
+        assign button_link = section.settings.button_link | escape
+        assign image = section.settings.image
+        assign map_iframe = section.settings.map_iframe
+    -%}
+
+    {%- render 'offset' 
+        id: section.id
+        padding_top: padding_top, 
+        padding_bottom: padding_bottom,
+        margin_top: margin_top,
+        margin_bottom: margin_bottom
+    -%}
+
+    <section id="section-{{ section.id }}">
+        <div class="page-width">
+            {%- if heading != blank -%}
+                <h1 class="text-center
+                text-2xl
+                styled-span
+                xl:text-6xl
+                max-w-4xl
+                mx-auto">{{ heading }}</h1>
+            {%- endif -%}
+
+            {%- if subtitle != blank -%}
+                <p class="text-center
+                xl:font-bold
+                tracking-normal
+                text-lg
+                xl:text-3xl
+                max-w-3xl
+                mx-auto
+                mt-5">{{ subtitle }}</p>
+            {%- endif -%}
+
+           {%- if section.blocks.size > 0 -%}
+                <ul class="mt-10
+                    xl:mt-28
+                    xl:grid
+                    grid-cols-autofit
+                    gap-8">
+                    {%- for block in section.blocks -%}
+                        {%- liquid
+                            assign link_title = block.settings.link_title | escape
+                            assign link = block.settings.link
+                            assign icon = block.settings.icon
+                            assign heading = block.settings.title | escape
+                            assign social_links = block.settings.social_links
+                        -%}
+                        {%- if heading != blank -%}
+                            <li class="{% unless forloop.last %}mb-4{% endunless %} xl:mb-0">
+                                <div class="xl:pt-16 
+                                    xl:pr-16 
+                                    xl:pl-16 
+                                    xl:pb-14
+                                    px-8
+                                    py-6
+                                    border
+                                    border-silver2">
+                                    {%- if icon != blank -%}
+                                        <div class="hidden
+                                            xl:flex
+                                            items-center
+                                            justify-center
+                                            h-24
+                                            w-24
+                                            mb-20
+                                            rounded-full
+                                            bg-flash">
+                                            {{ icon }}
+                                        </div>
+                                    {%- endif -%}
+
+                                    <div class="xl:block flex items-center justify-between">
+                                        <h6>{{ heading }}</h6>
+
+                                        {%- if link_title != blank -%}
+                                            <div class="flex items-center xl:mt-4 h-10">
+                                              	{%- if link != blank -%}
+                                                  <a class="underline
+                                                      font-bold
+                                                      text-1xl
+                                                      xl:text-3xl
+                                                      tracking-normal
+                                                      leading-none" href="{{ link }}">
+                                                    {{ link_title }}
+                                                  </a>
+                                              	{%- else -%}
+                                              	  <span class="font-bold
+                                                      text-1xl
+                                                      xl:text-3xl
+                                                      tracking-normal
+                                                      leading-none">
+                                                    {{ link_title }}
+                                                  </span>
+                                              	{%- endif -%}
+                                            </div>
+                                        {%- endif -%}
+
+                                        {%- if social_links -%}
+                                            <div class="xl:mt-4 flex items-center h-10">
+                                                {%- render 'social-media', position: 'start', smaller: true -%}
+                                            </div>
+                                        {%- endif -%}
+                                    </div>
+                                </div>
+                            </li>
+                        {%- endif -%}
+                    {%- endfor -%}
+                </ul>
+           {%- endif -%}
+        </div>
+
+        <div
+          {% if map_iframe != blank %}
+              id="map"
+          {% endif %}
+          class="relative 
+		  h-[37.8rem]
+          xl:h-[90rem]
+          flex
+		  items-end
+          xl:items-center
+		  py-8
+		  mt-8
+          xl:mt-20
+          {% if map_iframe != blank %}
+              map-wrapper
+          {% endif %}">
+          <div class="page-width">
+            <div class="max-w-screen-2xl
+              mx-auto
+              flex
+              items-center
+			  justify-center
+              xl:justify-between">
+                <div class="xl:ml-[7rem]
+				  w-full
+                  max-w-[35.4rem]
+                  pt-10
+				  pb-8
+				  pl-8
+				  pr-8
+                  xl:pb-12
+                  xl:pl-12
+                  xl:pr-12
+                  bg-white
+                  z-10
+                  relative">
+                  <div class="flex
+                    absolute
+                    top-0
+                    transform
+                    -translate-y-2/3
+                    left-1/2
+                    -translate-x-1/2
+                    z-10">
+                    {%- render 'icon-pin-large' -%}
+                  </div>
+
+                  {%- if location_title != blank -%}
+                    <h2 class="text-center text-lg xl:text-2xl mb-0">{{ location_title }}</h2>
+                  {%- endif -%}
+
+                  {%- if address != blank -%}
+                    <p class="text-center tracking-normal text-lg mt-2 xl:mt-4">{{ address }}</p>
+                  {%- endif -%}
+
+                  {%- if button_label != blank
+                    and button_link != blank -%}
+                    <div class="mt-5 xl:mt-6">
+                      <a class="btn
+                        btn--inverted
+                        btn--secondary
+                        w-full
+                        !flex
+                        items-center
+                        justify-center" href="{{ button_link }}">
+                        <span class="flex mr-5">
+                          {%- render 'icon-pin' -%}
+                        </span>
+                        {{ button_label }}
+                      </a>
+                    </div>
+                  {%- endif -%}
+                </div>
+
+                <div class="hidden 
+				  xl:block
+				  w-[46rem]
+                  bg-white
+                  z-10
+                  border-2
+                  border-primary
+                  pt-10
+                  pb-16
+                  pl-16
+                  pr-16">
+                  {%- if form_title != blank -%}
+                    <h2 class="styled-span
+                      text-center
+                      mb-0
+                      text-6xl
+                      max-w-[25rem]
+                      mx-auto">{{ form_title }}</h2>
+                  {%- endif -%}
+
+                  {%- if form_subtitle != blank -%}
+                    <p class="text-2xl
+                      font-bold
+                      tracking-normal
+                      text-center
+                      mt-2">{{ form_subtitle }}</p>
+                  {%- endif -%}
+
+                  <div class="mt-7">
+                    {%- form 'contact', id: 'ContactForm' -%}
+                       {%- if form.posted_successfully? -%}
+                    		<div class="px-6 py-4 border border-primary mb-4" tabindex="-1" autofocus>
+                              {{ 'templates.contact.form.post_success' | t }}
+                    		</div>
+                       {%- elsif form.errors -%}
+                          <div class="px-6 py-4 border border-primary mb-4" tabindex="-1" autofocus>
+                             {{ form.errors.translated_fields['email'] | capitalize }} {{ form.errors.messages['email'] }}
+                          </div>
+                       {%- endif -%}
+                    
+                       
+
+                       <div>
+                 		<div class="field">
+                            <input
+                            autocomplete="email"
+                            type="email"
+                            id="ContactForm-email"
+                            class="field__input"
+                            name="contact[email]"
+                            spellcheck="false"
+                            autocapitalize="off"
+                            value="{% if form.email %}{{ form.email }}{% elsif customer %}{{ customer.email }}{% endif %}"
+                            aria-required="true"
+                            {% if form.errors contains 'email' %}
+                              aria-invalid="true"
+                              aria-describedby="ContactForm-email-error"
+                            {% endif %}
+                            placeholder="{{ 'templates.contact.form.email' | t }}"
+                          >
+                          <label class="field__label" for="ContactForm-email">{{ 'templates.contact.form.email' | t }}</label>
+                       </div>
+                    
+                       <div class="field mt-6">
+                         <input class="field__input" autocomplete="full_name" type="text" id="ContactForm-name" name="contact[{{ 'templates.contact.form.full_name' | t }}]" placeholder="{{ 'templates.contact.form.full_name' | t }}">
+                         <label class="field__label" for="ContactForm-name">{{ 'templates.contact.form.full_name' | t }}</label>
+                       </div>
+                         
+                        <div class="field select mt-6">
+                          <select
+                             class="field__input"
+							 id="ContactForm-subject"
+						     name="contact[{{ 'templates.contact.form.subject' | t }}]"
+							 autocomplete="subject"
+							 placeholder="{{ 'templates.contact.form.subject' | t }}"
+							>
+                            	<option value="{{ 'templates.contact.form.shipping' | t }}">{{ 'templates.contact.form.shipping' | t }}</option>
+                            	<option value="{{ 'templates.contact.form.returns' | t }}">{{ 'templates.contact.form.returns' | t }}</option>
+                            	<option value="{{ 'templates.contact.form.order' | t }}">{{ 'templates.contact.form.order' | t }}</option>
+                            	<option value="{{ 'templates.contact.form.product_information' | t }}">{{ 'templates.contact.form.product_information' | t }}</option>
+                            	<option value="{{ 'templates.contact.form.other' | t }}">{{ 'templates.contact.form.other' | t }}</option>
+							</select>
+                            <label class="field__label" for="ContactForm-subject">{{ 'templates.contact.form.subject' | t }}</label>
+							<svg xmlns="http://www.w3.org/2000/svg" width="10" height="7" viewBox="0 0 10 7" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M9.85355 0.939354C9.65829 0.744092 9.34171 0.744092 9.14645 0.939354L5 5.0858L0.853554 0.939355C0.658291 0.744093 0.341709 0.744093 0.146446 0.939355C-0.0488155 1.13462 -0.0488155 1.4512 0.146446 1.64646L5 6.50001L9.85355 1.64646C10.0488 1.4512 10.0488 1.13462 9.85355 0.939354Z" fill="#303030"/></svg>
+                        </div>
+
+                        <div class="field mt-6">
+                          <input type="text" id="ContactForm-order_number" class="field__input" autocomplete="order_number" name="contact[{{ 'templates.contact.form.order_number' | t }}]" placeholder="{{ 'templates.contact.form.order_number' | t }}">
+                          <label class="field__label" for="ContactForm-order_number">{{ 'templates.contact.form.order_number' | t }}</label>
+                        </div>
+
+                        <div class="field mt-6">
+                          <input class="field__input" autocomplete="message" type="text" id="ContactForm-message" name="contact[{{ 'templates.contact.form.comment' | t }}]" placeholder="{{ 'templates.contact.form.comment' | t }}">
+                          <label class="field__label" for="ContactForm-message">{{ 'templates.contact.form.comment' | t }}</label>
+                        </div>
+
+                        <button class="btn w-full mt-6" type="submit">
+                          {{ 'templates.contact.form.send' | t }}
+                        </button>
+                       </div>
+                    {%- endform -%}
+                  </div>
+                </div>
+              </div>
+          </div>
+		
+          {%- if map_iframe != blank -%}
+          	{{ map_iframe }}
+          {%- else -%}
+            {%- if image -%}
+              {%- render 'img', image: image -%}
+            {%- endif -%}
+          {%- endif -%}
+        </div>
+
+		<div class="xl:hidden my-8">
+			<div class="page-width">
+				<div class="
+					w-full
+					max-w-[46rem]
+					mx-auto
+					bg-white
+					z-10
+					border-2
+					border-primary
+					pt-10
+					pb-8
+					pl-8
+					pr-8">
+					{%- if form_title != blank -%}
+					<h2 class="styled-span
+						text-center
+						mb-0
+						text-2xl
+						max-w-[25rem]
+						mx-auto">{{ form_title }}</h2>
+					{%- endif -%}
+
+					{%- if form_subtitle != blank -%}
+					<p class="text-1xl
+						font-bold
+						tracking-normal
+						text-center
+						mt-5">{{ form_subtitle }}</p>
+					{%- endif -%}
+
+					<div class="mt-8">
+						{%- form 'contact', id: 'ContactForm' -%}
+							{%- if form.posted_successfully? -%}
+                      			<div class="px-6 py-4 border border-primary mb-4" tabindex="-1" autofocus>
+                                  {{ 'templates.contact.form.post_success' | t }}
+                                </div>
+							{%- elsif form.errors -%}
+								<div class="px-6 py-4 border border-primary mb-4" tabindex="-1" autofocus>
+									{{ form.errors.translated_fields['email'] | capitalize }} {{ form.errors.messages['email'] }}
+                     			</div>
+							{%- endif -%}
+
+							<div>
+                 		<div class="field">
+                            <input
+                            autocomplete="email"
+                            type="email"
+                            id="ContactForm-email"
+                            class="field__input"
+                            name="contact[email]"
+                            spellcheck="false"
+                            autocapitalize="off"
+                            value="{% if form.email %}{{ form.email }}{% elsif customer %}{{ customer.email }}{% endif %}"
+                            aria-required="true"
+                            {% if form.errors contains 'email' %}
+                              aria-invalid="true"
+                              aria-describedby="ContactForm-email-error"
+                            {% endif %}
+                            placeholder="{{ 'templates.contact.form.email' | t }}"
+                          >
+                          <label class="field__label" for="ContactForm-email">{{ 'templates.contact.form.email' | t }}</label>
+                       </div>
+                    
+                       <div class="field mt-6">
+                         <input class="field__input" autocomplete="full_name" type="text" id="ContactForm-name" name="contact[{{ 'templates.contact.form.full_name' | t }}]" placeholder="{{ 'templates.contact.form.full_name' | t }}">
+                         <label class="field__label" for="ContactForm-name">{{ 'templates.contact.form.full_name' | t }}</label>
+                       </div>
+                         
+                        <div class="field select mt-6">
+                          <select
+                             class="field__input"
+							 id="ContactForm-subject"
+						     name="contact[{{ 'templates.contact.form.subject' | t }}]"
+							 autocomplete="subject"
+							 placeholder="{{ 'templates.contact.form.subject' | t }}"
+							>
+                            	<option value="{{ 'templates.contact.form.shipping' | t }}">{{ 'templates.contact.form.shipping' | t }}</option>
+                            	<option value="{{ 'templates.contact.form.returns' | t }}">{{ 'templates.contact.form.returns' | t }}</option>
+                            	<option value="{{ 'templates.contact.form.order' | t }}">{{ 'templates.contact.form.order' | t }}</option>
+                            	<option value="{{ 'templates.contact.form.product_information' | t }}">{{ 'templates.contact.form.product_information' | t }}</option>
+                            	<option value="{{ 'templates.contact.form.other' | t }}">{{ 'templates.contact.form.other' | t }}</option>
+							</select>
+                            <label class="field__label" for="ContactForm-subject">{{ 'templates.contact.form.subject' | t }}</label>
+							<svg xmlns="http://www.w3.org/2000/svg" width="10" height="7" viewBox="0 0 10 7" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M9.85355 0.939354C9.65829 0.744092 9.34171 0.744092 9.14645 0.939354L5 5.0858L0.853554 0.939355C0.658291 0.744093 0.341709 0.744093 0.146446 0.939355C-0.0488155 1.13462 -0.0488155 1.4512 0.146446 1.64646L5 6.50001L9.85355 1.64646C10.0488 1.4512 10.0488 1.13462 9.85355 0.939354Z" fill="#303030"/></svg>
+                        </div>
+
+                        <div class="field mt-6">
+                          <input type="text" id="ContactForm-order_number" class="field__input" autocomplete="order_number" name="contact[{{ 'templates.contact.form.order_number' | t }}]" placeholder="{{ 'templates.contact.form.order_number' | t }}">
+                          <label class="field__label" for="ContactForm-order_number">{{ 'templates.contact.form.order_number' | t }}</label>
+                        </div>
+
+                        <div class="field mt-6">
+                          <input class="field__input" autocomplete="message" type="text" id="ContactForm-message" name="contact[{{ 'templates.contact.form.comment' | t }}]" placeholder="{{ 'templates.contact.form.comment' | t }}">
+                          <label class="field__label" for="ContactForm-message">{{ 'templates.contact.form.comment' | t }}</label>
+                        </div>
+
+                        <button class="btn w-full mt-6" type="submit">
+                          {{ 'templates.contact.form.send' | t }}
+                        </button>
+                       </div>
+						{%- endform -%}
+					</div>
+				</div>
+			</div>
+		</div>
+    </section>
+{%- endif -%}
+
+{% stylesheet %}
+	.map-wrapper iframe {
+		width: 100%;
+		height: 100%;
+		position: absolute;
+		top: 0;
+		bottom: 0;
+		right: 0;
+		left: 0;
+		z-index: 1;
+	}
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Contact main",
+  "settings": [
+	{
+      "type": "number",
+      "id": "padding_top",
+      "label": "Padding top (rem)",
+      "default": 0,
+      "info": "1rem = 10px"
+    },
+    {
+      "type": "number",
+      "id": "padding_bottom",
+      "label": "Padding bottom (rem)",
+      "default": 0,
+      "info": "1rem = 10px"
+    },
+    {
+      "type": "number",
+      "id": "margin_top",
+      "label": "Margin top (rem)",
+      "default": 100,
+      "info": "1rem = 10px"
+    },
+    {
+      "type": "number",
+      "id": "margin_bottom",
+      "label": "Margin bottom (rem)",
+      "default": 100,
+      "info": "1rem = 10px"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Title"
+    },
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Subtitle"
+    },
+    {
+      "type": "text",
+      "id": "form_title",
+      "label": "Form title"
+    },
+    {
+      "type": "text",
+      "id": "form_subtitle",
+      "label": "Form subtitle"
+    },
+    {
+      "type": "text",
+      "id": "location_title",
+      "label": "Location title"
+    },
+    {
+      "type": "text",
+      "id": "address",
+      "label": "Address"
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Button label"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "Button link"
+    },
+    {
+        "type": "image_picker",
+        "id": "image",
+        "label": "Image"
+    },
+    {
+        "type": "html",
+        "id": "map_iframe",
+        "label": "Map iframe"
+    }
+  ],
+  "blocks": [
+    {
+    "type": "contact",
+    "name": "contact",
+      "settings": [
+        {
+          "type": "html",
+          "id": "icon",
+          "label": "Icon (SVG)"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title"
+        },
+		{
+          "type": "text",
+          "id": "link_title",
+          "label": "Link title"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link"
+        },
+        {
+          "type": "checkbox",
+          "id": "social_links",
+          "label": "Social links"
+        }
+      ]
+    }
+  ],
+  "presets":[
+    {
+    	"name": "Contact main"
+    }
+  ]
+}
+{% endschema %}

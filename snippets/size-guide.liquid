@@ -1,0 +1,219 @@
+{%- liquid
+    assign sg_logo = settings.sg_logo
+-%}
+
+{%- if sg_logo != blank -%}
+    <div class="flex justify-center mb-8">
+        <a href="{{ routes.root_url }}" class="flex">
+            {{ sg_logo }}
+        </a>
+    </div>
+{%- endif -%}
+
+<h2 class="text-2xl 
+xl:text-3xl
+text-center
+normal-case
+tracking-normal
+styled-span">Size Guide</h2>
+
+<div class="mt-10">
+    <ul class="p-1.5 
+        bg-flash
+            rounded-[1.9rem]
+            max-w-[75rem]
+            mx-auto
+            xl:flex
+            xl:items-center
+            xl:justify-between">
+        <li class="tab-button-wrapper w-full xl:w-1/3 active">
+            <button class="tab-button
+                border
+                border-transparent
+                bg-transparent
+                rounded-[1.9rem]
+                text-center
+                uppercase
+                w-full
+                py-2.5
+                px-4
+                relative
+                hover:opacity-70"
+                data-id="content-sg-1">
+                Mid Rise
+            </button>
+        </li>
+
+        <li class="tab-button-wrapper w-full xl:w-1/3">
+            <button class="tab-button
+                border
+                border-transparent
+                bg-transparent
+                rounded-[1.9rem]
+                text-center
+                uppercase
+                w-full
+                py-2.5
+                px-4
+                relative
+                hover:opacity-70
+                after:content-['']
+                after:absolute
+                after:block
+                after:h-[1px]
+                xl:after:h-3
+                after:w-[calc(100%_-_4rem)]
+                xl:after:w-[1px]
+                after:bg-silver2
+                after:z-20
+                after:left-1/2
+                xl:after:left-0
+                after:top-0
+                xl:after:top-1/2
+                after:transform
+                after:-translate-x-1/2
+                xl:after:-translate-x-0
+                xl:after:-translate-y-1/2"
+                data-id="content-sg-2">
+                High Rise
+            </button>
+        </li>
+
+        <li class="tab-button-wrapper w-full xl:w-1/3">
+            <button class="tab-button
+                border
+                border-transparent
+                bg-transparent
+                rounded-[1.9rem]
+                text-center
+                uppercase
+                w-full
+                py-2.5
+                px-4
+                relative
+                hover:opacity-70
+                after:content-['']
+                after:absolute
+                after:block
+                after:h-[1px]
+                xl:after:h-3
+                after:w-[calc(100%_-_4rem)]
+                xl:after:w-[1px]
+                after:bg-silver2
+                after:z-20
+                after:left-1/2
+                xl:after:left-0
+                after:top-0
+                xl:after:top-1/2
+                after:transform
+                after:-translate-x-1/2
+                xl:after:-translate-x-0
+                xl:after:-translate-y-1/2"
+                data-id="content-sg-3">
+                Plus High Rise
+            </button>
+        </li>
+    </ul>
+        
+    <div class="mt-8">
+        <div id="content-sg-1" class="tab-content rte">
+            {{ pages['size-guide-mid-rise'].content }}
+        </div>
+
+        <div id="content-sg-2" class="hidden tab-content rte">
+            {{ pages['size-guide-high-rise'].content }}
+        </div>
+
+        <div id="content-sg-3" class="hidden tab-content rte">
+            {{ pages['size-guide-plus-high-rise'].content }}
+        </div>
+    </div>
+
+    <script>
+        window.addEventListener('DOMContentLoaded', (event) => {
+            const tab_button_wrappers = document.querySelectorAll('.tab-button-wrapper')
+            const tab_contents = document.querySelectorAll('.tab-content')
+            if (tab_button_wrappers) {
+                tab_button_wrappers.forEach((tab_button_wrapper) => {
+                    const tab_button = tab_button_wrapper.querySelector('button')
+                    const tab_content_id = tab_button.getAttribute('data-id')
+                    if (tab_button) {
+                        tab_button.addEventListener('click', () => {
+                            event.preventDefault()
+
+                            tab_button_wrappers.forEach((_tab_button_wrapper) => {
+                                _tab_button_wrapper.classList.remove('active')
+                            })
+
+                            if (tab_contents) {
+                                tab_contents.forEach((tab_content) => {
+                                    tab_content.classList.add('hidden')
+                                })
+                            }
+
+                            tab_button_wrapper.classList.add('active')
+
+                            const tab_content = document.getElementById(tab_content_id)
+                            if (tab_content) {
+                                tab_content.classList.remove('hidden')
+                            }
+                        })
+                    }
+                })
+            }
+        })
+    </script>
+</div>
+
+<div class="mt-12">
+    {%- liquid
+        assign sg_footer_title = settings.sg_footer_title
+    -%}
+    <h2 class="text-2xl 
+        xl:text-5xl
+        text-center
+        styled-span
+        tracking-normal
+        xl:max-w-5xl
+        mx-auto
+        mb-0">{{ sg_footer_title }}</h2>
+
+    <ul class="grid grid-cols-2 xl:grid-cols-4 justify-center gap-4 mt-12">
+        {%- for i in (1..4) -%}
+            {%- capture sg_icon_i -%}sg_icon_{{ i }}{%- endcapture -%}
+            {%- capture sg_title_i -%}sg_icon_title_{{ i }}{%- endcapture -%}
+            {%- capture sg_subtitle_i -%}sg_icon_subtitle_{{ i }}{%- endcapture -%}
+            {%- liquid
+                assign sg_icon = settings[sg_icon_i]
+                assign sg_title = settings[sg_title_i] | escape
+                assign sg_subtitle = settings[sg_subtitle_i] | escape
+            -%}
+            {%- if sg_icon != blank
+                and sg_title != blank
+                and sg_subtitle != blank -%}
+                <li class="xl:px-4 text-center">
+                    <div class="max-w-[14.5rem] mx-auto">
+                        <div class="flex items-center justify-center">
+                            {{ sg_icon }}
+                        </div>
+                        <h3 class="mt-5 text-lg font-bold xl:text-1xl tracking-normal">{{ sg_title }}</h3>
+                        <p class="mt-2 text-md xl:text-lg tracking-normal">{{ sg_subtitle }}</p>
+                    </div>
+                </li>
+            {%- endif -%}
+        {%- endfor -%}
+    </ul>
+</div>
+
+{%- if show_button -%}
+    {%- liquid
+        assign sg_btn_label = settings.sg_btn_label | escape
+        assign sg_btn_link = settings.sg_btn_link
+    -%}
+    {%- if sg_btn_label != blank
+        and sg_btn_link != blank -%}
+        <div class="mt-12 flex justify-center">
+            <a href="{{ sg_btn_link }}" class="btn">{{ sg_btn_label }}</a>
+        </div>
+    {%- endif -%}
+{%- endif -%}

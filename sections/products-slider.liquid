@@ -1,0 +1,151 @@
+{{ 'slider.css' | asset_url | stylesheet_tag }}
+{%- assign collection_handle = section.settings.collection -%}
+{%- if collection_handle != blank -%}
+  {%- assign featured_collection = collections[collection_handle] -%}
+  {%- if featured_collection.products_count > 5 -%}
+    {%- liquid
+            assign padding_top = section.settings.padding_top | default: 0
+            assign padding_bottom = section.settings.padding_bottom | default: 0
+            assign margin_top = section.settings.margin_top | default: 0
+            assign margin_bottom = section.settings.margin_bottom | default: 0
+            assign limit = section.settings.limit
+            assign heading = section.settings.title
+        -%}
+
+    {%- render 'offset'
+      id: section.id
+      padding_top: padding_top,
+      padding_bottom: padding_bottom,
+      margin_top: margin_top,
+      margin_bottom: margin_bottom -%}
+
+    <section id="section-{{ section.id }}">
+      {%- if heading != blank -%}
+        <div class="page-width">
+          <h2 class="text-center styled-span">{{ heading }}</h2>
+        </div>
+      {%- endif -%}
+
+      <div class="mt-11 xl:mt-16">
+        <div class="page-width">
+          <div
+            id="products-slider-{{ section.id }}"
+            class="splide"
+            aria-label="{{ store.name }} products slider">
+            <div class="splide__arrows splide__arrows--products">
+              <button class="splide__arrow splide__arrow--prev">
+                {%- render 'icon-prev' -%}
+              </button>
+              <button class="splide__arrow splide__arrow--next">
+                {%- render 'icon-next' -%}
+              </button>
+            </div>
+
+            <div class="splide__track">
+              <ul class="splide__list">
+                {%- for prod in featured_collection.products limit: limit -%}
+                  <li class="splide__slide">
+                    {%- render 'product-card-quick-add' product_card_product: prod -%}
+                  </li>
+                {%- endfor -%}
+              </ul>
+            </div>
+
+            <ul class="splide__pagination"></ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        let slider_selector = '#products-slider-' + '{{ section.id }}'
+
+        new Splide(slider_selector, {
+          perPage: 5,
+          perMove: 1,
+          padding: '0',
+          type: 'loop',
+          gap: 2,
+          arrows: true,
+          pagination: true,
+          breakpoints: {
+            1535: {
+              perPage: 4
+            },
+            1279: {
+              perPage: 5
+            },
+            1023: {
+              perPage: 4
+            },
+            767: {
+              perPage: 3
+            },
+            639: {
+              perPage: 2
+            }
+          }
+        }).mount()
+      })
+    </script>
+  {%- endif -%}
+{%- endif -%}
+
+{% schema %}
+  {
+    "name": "Products slider",
+    "settings": [
+      {
+        "type": "number",
+        "id": "padding_top",
+        "label": "Padding top (rem)",
+        "default": 0,
+        "info": "1rem = 10px"
+      },
+      {
+        "type": "number",
+        "id": "padding_bottom",
+        "label": "Padding bottom (rem)",
+        "default": 0,
+        "info": "1rem = 10px"
+      },
+      {
+        "type": "number",
+        "id": "margin_top",
+        "label": "Margin top (rem)",
+        "default": 100,
+        "info": "1rem = 10px"
+      },
+      {
+        "type": "number",
+        "id": "margin_bottom",
+        "label": "Margin bottom (rem)",
+        "default": 100,
+        "info": "1rem = 10px"
+      }, {
+        "type": "text",
+        "id": "title",
+        "label": "Title"
+      }, {
+        "type": "collection",
+        "id": "collection",
+        "label": "Collection",
+        "info": "Select a collection to pull products from."
+      }, {
+        "type": "range",
+        "min": 6,
+        "max": 20,
+        "step": 2,
+        "default": 10,
+        "id": "limit",
+        "label": "Number of products"
+      }
+    ],
+    "presets": [
+      {
+        "name": "Products slider"
+      }
+    ]
+  }
+{% endschema %}

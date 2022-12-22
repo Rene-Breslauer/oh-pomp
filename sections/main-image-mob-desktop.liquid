@@ -1,0 +1,47 @@
+<div class="main-mob-desktop-image-wrapper">
+    <a href="{{ section.settings.image_link }}" class="w-full block">
+        {%- if section.settings.image_mob != blank -%}
+            <div class="image-mob block xl:hidden relative w-full">
+                {%- render 'img', image: section.settings.image_mob, class: 'relative' -%}
+            </div>
+        {%- endif -%}
+        {%- if section.settings.image_desktop != blank -%}
+            <div class="image-desktop hidden xl:block relative w-full">
+                {%- render 'img', image: section.settings.image_desktop, class: 'relative' -%}
+            </div>
+        {%- endif -%}
+    </a>
+</div>
+<style>
+    .main-mob-desktop-image-wrapper a:not(.btn):hover{
+        opacity: 1;
+    }
+</style>
+
+{% schema %}
+{
+  "name": "Image Mobile And Desktop",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "image_desktop",
+      "label": "Image desktop"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_mob",
+      "label": "Image mobile"
+    },
+    {
+      "type": "url",
+      "id": "image_link",
+      "label": "Link"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Image Mobile And Desktop"
+    }
+  ]
+}
+{% endschema %}

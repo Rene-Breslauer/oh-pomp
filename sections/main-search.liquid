@@ -1,0 +1,96 @@
+<script src="{{ 'product-grid.js' | asset_url }}" defer="defer"></script>
+
+<div class="py-12 xl:py-20">
+    <div class="page-width page-width--smaller">
+        <h1 class="text-2xl 
+            xl:text-5xl
+            text-center
+            styled-span">{{ 'templates.search.search_for' | t: terms: search.terms }}</h1>
+        {%- if search.performed -%}
+            <div class="product-grid-container mt-12 xl:mt-24" id="ProductGridContainer">
+                {%- if search.results.size == 0 -%}
+                <div>
+                    <h4 class="text-center uppercase">{{ 'templates.search.no_results' | t: terms: search.terms }}</h4>
+                </div>
+                {%- else -%}
+                    {% paginate search.results by 8 %}
+                        <div class="collection">
+                            <div class="loading-overlay gradient"></div>
+                            <product-grid>
+                                <ul id="product-grid"
+                                    class="
+                                    grid 
+                                    grid-cols-2
+                                    sm:grid-cols-4 
+                                    xl:grid-cols-4 
+                                    gap-x-[2px] 
+                                    gap-y-5 
+                                    xl:gap-y-10"
+                                    role="list"
+                                    data-next-url="{{ paginate.next.url }}">
+                                    {%- for item in search.results -%}
+                                        <li>
+                                            {%- case item.object_type -%}
+                                                {%- when 'product' -%}
+                                                    {%- render 'product-card' product_card_product: item -%}
+                                                {%- when 'article' -%}
+                                                    <div>
+                                                        <a href="{{ item.url }}" class="p-8 border block border-primary">
+                                                            <h4>
+                                                                {{ item.title | truncate: 50 | escape }}
+                                                            </h4>
+                                                            <p class="mt-6">{{ item.content | truncate: 150 | strip_html }}</p>
+                                                        </a>
+                                                    </div>
+                                                {%- when 'page' -%}
+                                                        <div>
+                                                            <a href="{{ item.url }}" class="p-8 border block border-primary">
+                                                                <h4>
+                                                                    {{ item.title | truncate: 50 | escape }}
+                                                                </h4>
+                                                                <p class="mt-6">{{ item.content | truncate: 150 | strip_html }}</p>
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            {%- endcase -%}
+                                        </li>
+                                    {%- endfor -%}
+                                </ul>
+
+                                {%- if paginate.pages > 1 -%}
+                                    <div class="loader-wrapper hidden mt-20 w-36 mx-auto">
+                                        <div class="w-full 
+                                                bg-flash
+                                                rounded-[.4rem]
+                                                h-[.4rem]
+                                                relative">
+                                                <div class="absolute
+                                                    left-0
+                                                    top-0
+                                                    bg-primary
+                                                    h-full
+                                                    w-1/5
+                                                    rounded-[.4rem]
+                                                    loader-animate"></div>
+                                        </div>
+                                        <p class="text-center uppercase text-sm text-silver2 mt-3">Loading</p>
+                                    </div>
+                
+                                {%- endif -%}
+                            </product-grid>
+                        </div>
+                    {% endpaginate %}
+                {%- endif -%}
+            </div>
+        {%- endif -%}
+    </div>
+</div>
+
+{% schema %}
+{
+  "name": "t:sections.main-search.name",
+  "tag": "section",
+  "class": "section"
+}
+{% endschema %}

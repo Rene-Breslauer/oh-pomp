@@ -1,0 +1,29 @@
+{%- liquid
+    assign padding_top_desktop = padding_top | default: 0 | append: 'rem'
+    assign padding_bottom_desktop = padding_bottom | default: 0 | append: 'rem'
+    assign padding_top_mobile = padding_top | default: 0 | times: 0.625 | append: 'rem'
+    assign padding_bottom_mobile = padding_bottom | default: 0 | times: 0.625 | append: 'rem'
+
+    assign margin_top_desktop = margin_top | default: 0 | append: 'rem'
+    assign margin_bottom_desktop = margin_bottom | default: 0 | append: 'rem'
+    assign margin_top_mobile = margin_top | default: 0 | times: 0.625 | append: 'rem'
+    assign margin_bottom_mobile = margin_bottom | default: 0 | times: 0.625 | append: 'rem'
+-%}
+
+<style>
+    #section-{{ id }} {
+        padding-top: {{ padding_top_mobile }};
+        padding-bottom: {{ padding_bottom_mobile }};
+        margin-top: {{ margin_top_mobile }};
+        margin-bottom: {{ margin_bottom_mobile }};
+    }
+
+    @media only screen and (min-width: 1280px) {
+        #section-{{ id }} {
+            padding-top: {{ padding_top_desktop }};
+            padding-bottom: {{ padding_bottom_desktop }};
+            margin-top: {{ margin_top_desktop }};
+            margin-bottom: {{ margin_bottom_desktop }};
+        }
+    }
+</style>

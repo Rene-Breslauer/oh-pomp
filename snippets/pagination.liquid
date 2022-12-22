@@ -1,0 +1,37 @@
+{%- if paginate.pages > 1 -%}
+    {%- if paginate.parts.size > 0 -%}
+        <nav class="mt-8 xl:mt-12" role="navigation" aria-label="{{ 'general.pagination.label' | t }}">
+            <ul class="flex items-center justify-center" role="list">
+                {%- if paginate.previous -%}
+                    <li class="mx-3">
+                        <a class="btn border border-primary !flex items-center justify-center !p-0 w-12 h-12" href="{{ paginate.previous.url }}" aria-label="{{ 'general.pagination.previous' | t }}">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="5" height="8" viewBox="0 0 5 8" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M4.54549 0.359835C4.69194 0.506282 4.69194 0.743718 4.54549 0.890165L1.43566 4L4.54549 7.10983C4.69194 7.25628 4.69194 7.49372 4.54549 7.64017C4.39905 7.78661 4.16161 7.78661 4.01516 7.64017L0.375 4L4.01516 0.359835C4.16161 0.213388 4.39905 0.213388 4.54549 0.359835Z" fill="#FFFFFF"/></svg>
+                        </a>
+                    </li>
+                {%- endif -%}
+
+                {%- for part in paginate.parts -%}
+                    <li class="mx-3">
+                        {%- if part.is_link -%}
+                            <a class="btn border border-primary !flex items-center justify-center !p-0 w-12 h-12" href="{{ part.url }}" aria-label="{{ 'general.pagination.page' | t: number: part.title }}">{{ part.title }}</a>
+                        {%- else -%}
+                            {%- if part.title == paginate.current_page -%}
+                                <span class="btn transition-all duration-150 ease-linear btn--inverted btn--secondary !flex items-center justify-center !p-0 w-12 h-12" aria-current="page" aria-label="{{ 'general.pagination.page' | t: number: part.title }}">{{ part.title }}</span>
+                            {%- else -%}
+                                <span class="btn transition-all duration-150 ease-linear btn--inverted btn--secondary !flex items-center justify-center !p-0 w-12 h-12">{{ part.title }}</span>
+                            {%- endif -%}
+                        {%- endif -%}
+                    </li>
+                {%- endfor -%}
+
+                {%- if paginate.next -%}
+                    <li class="mx-3">
+                        <a class="btn border border-primary !flex items-center justify-center !p-0 w-12 h-12" href="{{ paginate.next.url }}" aria-label="{{ 'general.pagination.next' | t }}" >
+                            <svg class="transform rotate-180" xmlns="http://www.w3.org/2000/svg" width="5" height="8" viewBox="0 0 5 8" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M4.54549 0.359835C4.69194 0.506282 4.69194 0.743718 4.54549 0.890165L1.43566 4L4.54549 7.10983C4.69194 7.25628 4.69194 7.49372 4.54549 7.64017C4.39905 7.78661 4.16161 7.78661 4.01516 7.64017L0.375 4L4.01516 0.359835C4.16161 0.213388 4.39905 0.213388 4.54549 0.359835Z" fill="#FFFFFF"/></svg>
+                        </a>
+                    </li>
+                {%- endif -%}
+            </ul>
+        </nav>
+    {%- endif -%}
+{%- endif -%}

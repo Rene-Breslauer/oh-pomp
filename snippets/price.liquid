@@ -1,0 +1,23 @@
+{%- liquid
+  if use_variant
+    assign target = product.selected_or_first_available_variant
+  else
+    assign target = product
+  endif
+
+  assign price = target.price | default: 1999
+  assign money_price = price | money
+  
+  assign compare_price = false
+
+  if target.compare_at_price
+    assign compare_price = target.compare_at_price | money
+  endif
+-%}
+
+<div>
+  <span class="font-bold text-md {% if compare_price %}text-jasper{% endif %}">{{- money_price -}}</span>
+  {% if compare_price %}
+    <s class="text-silver ml-2">{{- compare_price -}}</s>
+  {% endif %}
+</div>

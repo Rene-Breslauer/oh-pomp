@@ -1,0 +1,45 @@
+{%- liquid
+    assign second_image = product_card_product.images[1]
+-%}
+
+<div class="product-card {% if second_image %}product-card--second-img{% endif %} relative max-w-xl mx-auto">
+    {%- render 'product-badges', product: product_card_product -%}
+    
+    {%- render 'wishlisthero-collection-product-v2' product: product_card_product -%}
+
+    {%- if product_card_product.featured_media -%}
+        <a href="{{ product_card_product.url }}" 
+            class="relative
+                w-full
+                h-[25rem]
+                xl:h-[52rem]
+                block
+                overflow-hidden"> 
+            {% render 'img', image: product_card_product.featured_media %}
+            {%- if second_image -%}
+                {%- render 'img', image: second_image, class: 'hidden', loading: 'eager' -%}
+            {%- endif -%}
+        </a>
+    {%- endif -%} 
+
+    <div class="mt-4">
+        {%- comment -%}
+        {%- if product_card_product.vendor != blank -%}
+            <p class="text-sm 
+                text-silver 
+                uppercase
+                mb-1.5">{{ product_card_product.vendor }}</p>
+        {%- endif -%}
+        {%- endcomment -%}
+
+        <h4 class="uppercase max-w-md text-base font-normal">
+            <a href="{{ product_card_product.url }}">
+                {{ product_card_product.title }}
+            </a>
+        </h4>
+
+        <div class="mt-1">
+            {%- render 'price', product: product_card_product -%}
+        </div>
+    </div>
+</div>

@@ -1,0 +1,75 @@
+{%- liquid
+  assign announcement_enable = section.settings.announcement_enable
+  assign announcement_bg_color = section.settings.announcement_bg_color
+  assign announcement_scroll_speed = section.settings.announcement_scroll_speed
+-%}
+
+{%- if announcement_enable -%}
+  {{ 'announcement-bar.css' | asset_url | stylesheet_tag }}
+
+
+  {%- if section.blocks.size > 0 -%}
+    <section class="announcement-bar" {% if announcement_bg_color != blank %}style="background-color:{{ announcement_bg_color }}"{% endif %}>
+      {% for block in section.blocks %}
+        <div class="text-center uppercase"><p>{{ block.settings.announcement }}</p></div>
+      {% endfor %}
+    </section>
+  {%- endif -%}
+
+
+  <script>
+      $( document ).ready(function() {
+          $('.announcement-bar').slick({
+              slidesToShow: 1,
+              slidesToScroll: 1,
+              autoplay: true,
+              autoplaySpeed: {{ announcement_scroll_speed }},
+              prevArrow: '<button type="button" class="slick-prev"></button>',
+              nextArrow: '<button type="button" class="slick-next"></button>'
+          });
+      });
+  </script>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Announcement bar",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "announcement_enable",
+      "label": "Enable announcement bar",
+      "default": true
+    },
+    {
+      "type": "color",
+      "id": "announcement_bg_color",
+      "label": "Announcement background color",
+      "default": "#F1F1F1"
+    },
+    {
+      "type": "range",
+      "id": "announcement_scroll_speed",
+      "min": 3000,
+      "max": 8000,
+      "step": 500,
+      "unit": "ms",
+      "label": "Scroll speed",
+      "default": 3500
+    }
+  ],
+  "blocks": [
+    {
+      "type": "announcement",
+      "name": "Announcement",
+      "settings": [
+        {
+          "type": "text",
+          "id": "announcement",
+          "label": "Announcement"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

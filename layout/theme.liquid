@@ -1,0 +1,183 @@
+<!doctype html>
+<html class="no-js" lang="{{ request.locale.iso_code }}">
+  <head>
+    <meta name="google-site-verification" content="sqwNvf3FZC4Pw2kk1s__7fm0tGhnZD92MqeUEZyxJBQ" />
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="theme-color" content="">
+    <link rel="canonical" href="{{ canonical_url }}">
+    <link rel="preconnect" href="https://cdn.shopify.com" crossorigin>
+    
+    <link rel="icon" href="{{ 'favicon.ico' | asset_url }}">
+	  <link rel="icon" href="{{ 'favicon.svg' | asset_url }}" type="image/svg+xml">
+
+    {%- unless settings.type_header_font.system? and settings.type_body_font.system? -%}
+        <link rel="preconnect" href="https://fonts.shopifycdn.com" crossorigin>
+    {%- endunless -%}
+
+    <title>
+      {{ page_title }}
+      {%- if current_tags %} &ndash; tagged "{{ current_tags | join: ', ' }}"{% endif -%}
+      {%- if current_page != 1 %} &ndash; Page {{ current_page }}{% endif -%}
+      {%- unless page_title contains shop.name %} &ndash; {{ shop.name }}{% endunless -%}
+    </title>
+
+    {% if page_description %}
+      <meta name="description" content="{{ page_description | escape }}">
+    {% endif %}
+
+    {% render 'meta-tags' %}
+    
+    {% render "geo-custom" %}
+    {% render "geo" %}
+    <script src="https://code.jquery.com/jquery-3.6.3.js" integrity="sha256-nQLuAZGRRcILA+6dMBOvcRh5Pe310sBpanc6+QBmyVM=" crossorigin="anonymous"></script>
+
+    <script type="text/javascript" src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="//code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
+
+
+
+    <script src="{{ 'vendor.js' | asset_url }}" defer="defer"></script>
+    <script src="{{ 'global.js' | asset_url }}" defer="defer"></script>
+    <script src="{{ 'details-disclosure.js' | asset_url }}" defer="defer"></script>
+    <script src="{{ 'details-modal.js' | asset_url }}" defer="defer"></script>
+    <script type="text/javascript" src="//cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
+
+    {{ content_for_header }} 
+
+    {% style %}
+        {%- comment -%}
+            {{ settings.font_base | font_face: font_display: 'swap' }}
+        {%- endcomment -%}
+        {{ settings.font_secondary | font_face: font_display: 'swap' }}
+
+        :root {
+          --theme-base-color: {{ settings.color_base | default: '#303030' }};
+          --theme-inverted-color: {{ settings.color_inverted | default: '#fff' }};
+        
+          {%- comment -%}
+            --theme-font-base: {{ settings.font_base.family }}, {{ settings.font_base.fallback_families }};
+          {%- endcomment -%}
+          --theme-font-secondary: {{ settings.font_secondary.family }}, {{ settings.font_secondary.fallback_families }};
+        }
+
+        html {
+            font-size: 62.5%;
+            height: 100%;
+    		scroll-behavior: smooth;
+        }
+
+        body {
+            min-height: 100%;
+            margin: 0;
+            font-size: 1.2rem;
+            letter-spacing: 0.06em;
+            color: var(--theme-base-color);
+        }
+
+        @media screen and (min-width: 750px) {
+            body {
+                font-size: 1.2rem;
+            }
+        }
+    {% endstyle %}
+
+    <link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.css"/>
+
+    {{ 'main.css' | asset_url | stylesheet_tag }}
+    
+    {%- comment -%}
+    {%- unless settings.font_base.system? -%} 
+        <link rel="preload" as="font" href="{{ settings.font_base | font_url }}" type="font/woff2" crossorigin>
+      {%- endunless -%}
+    {%- endcomment -%}
+    {%- unless settings.font_secondary.system? -%}
+        <link rel="preload" as="font" href="{{ settings.font_secondary | font_url }}" type="font/woff2" crossorigin>
+    {%- endunless -%}
+
+    <script>document.documentElement.className = document.documentElement.className.replace('no-js', 'js');
+    if (Shopify.designMode) {
+      document.documentElement.classList.add('shopify-design-mode');
+    }
+    </script>
+    <meta name="facebook-domain-verification" content="w6tbwflxs6sfogl5qo2wseiks3zmkn" />
+  {% render 'wishlisthero-styles.liquid' %}
+  {% include 'analyzify-gtm-body' %}
+</head>
+  <!-- Hotjar Tracking Code for https://ohpomp.com/ -->
+<script>
+    (function(h,o,t,j,a,r){
+        h.hj=h.hj||function(){(h.hj.q=h.hj.q||[]).push(arguments)};
+        h._hjSettings={hjid:3170329,hjsv:6};
+        a=o.getElementsByTagName('head')[0];
+        r=o.createElement('script');r.async=1;
+        r.src=t+h._hjSettings.hjid+j+h._hjSettings.hjsv;
+        a.appendChild(r);
+    })(window,document,'https://static.hotjar.com/c/hotjar-','.js?sv=');
+</script>
+  <body>
+    
+    <div id="global-wrapper" 
+        class="overflow-x-hidden
+            min-h-screen
+            relative
+            grid
+            grid-rows-[auto_auto_1fr_auto]
+            grid-cols-[100%]"> 
+
+        {%- section 'announcement-bar' -%}
+
+        {%- section 'header' -%}
+
+        {%- render 'breadcrumbs' -%}
+
+        <main class="" role="main" tabindex="-1">
+            {{ content_for_layout }}
+        </main>
+   
+        {%- section 'footer' -%}
+    </div>
+
+    <script>
+      window.shopUrl = '{{ request.origin }}';
+      window.routes = {
+        cart_url: '{{ routes.cart_url }}',
+        cart_add_url: '{{ routes.cart_add_url }}',
+        cart_change_url: '{{ routes.cart_change_url }}',
+        cart_update_url: '{{ routes.cart_update_url }}',
+        predictive_search_url: '{{ routes.predictive_search_url }}'
+      };
+
+      window.cartStrings = {
+        error: `{{ 'sections.cart.cart_error' | t }}`,
+        quantityError: `{{ 'sections.cart.cart_quantity_error_html' | t: quantity: '[quantity]' }}`
+      }
+
+      window.variantStrings = {
+        addToCart: `{{ 'products.product.add_to_cart' | t }}`,
+        soldOut: `{{ 'products.product.sold_out' | t }}`,
+        unavailable: `{{ 'products.product.unavailable' | t }}`,
+      }
+
+      window.accessibilityStrings = {
+        imageAvailable: `{{ 'products.product.media.image_available' | t: index: '[index]' }}`,
+        shareSuccess: `{{ 'general.share.success_message' | t }}`,
+        pauseSlideshow: `{{ 'sections.slideshow.pause_slideshow' | t }}`,
+        playSlideshow: `{{ 'sections.slideshow.play_slideshow' | t }}`,
+      }
+      
+    </script>
+
+    {%- if settings.predictive_search_enabled -%}
+      <script src="{{ 'predictive-search.js' | asset_url }}" defer="defer"></script>
+    {%- endif -%}
+
+    {%- section 'newsletter-popup' -%}
+
+
+</script>
+ 
+</script>
+</body>
+</html>

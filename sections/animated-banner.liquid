@@ -1,0 +1,457 @@
+{%- if section.blocks.size > 0 -%}
+    {%- liquid
+        assign padding_top = section.settings.padding_top | default: 0
+        assign padding_bottom = section.settings.padding_bottom | default: 0
+        assign margin_top = section.settings.margin_top | default: 0
+        assign margin_bottom = section.settings.margin_bottom | default: 0
+        assign content_alignment = section.settings.content_align | default: 'left'
+        assign heading = section.settings.title
+        assign subtitle = section.settings.subtitle | escape
+        assign button_label = section.settings.button_label | escape
+        assign button_link = section.settings.button_link
+        assign note = section.settings.note | escape
+
+        assign popup_enable = section.settings.popup_enable
+        assign popup_title = section.settings.popup_title
+        assign popup_subtitle = section.settings.popup_subtitle | escape
+        assign popup_content = section.settings.popup_content | strip_html
+        assign popup_image = section.settings.popup_image
+    -%}
+
+    {%- render 'offset' 
+        id: section.id
+        padding_top: padding_top, 
+        padding_bottom: padding_bottom,
+        margin_top: margin_top,
+        margin_bottom: margin_bottom
+    -%}
+
+    <section id="section-{{ section.id }}">
+        <div class="page-width">
+            {%- assign bg_image = section.blocks[0].settings.image | image_url: width: 1820 -%}
+          	{%- assign _bg_image_mobile = section.blocks[0].settings.image_mobile -%}
+          	{%- assign bg_image_mobile = _bg_image_mobile | image_url: width: 768 -%}
+          
+            <div id="animate-bg-{{ section.id }}" class="relative -ml-8 w-[calc(100%_+_4rem)] xl:w-full xl:ml-0 bg-center bg-cover xl:bg-contain bg-no-repeat">
+                {%- if heading != blank -%}
+                    <div class="md:absolute
+                        {% if content_alignment == 'left' %}
+                            md:left-[5%]
+                        {%- else -%}
+                            md:right-[5%]
+                        {% endif %}
+                        md:top-1/2
+                        md:-translate-y-2/4
+                        py-12
+                        px-8
+                        md:p-0
+                        z-10
+                        w-full
+                        max-w-[72rem]
+                        bg-flash 
+                        md:bg-transparent">
+                    
+                        <h2 class="text-6xl 
+                            xl:text-9xl 
+                            mb-0 
+                            text-center 
+                            styled-span">{{ heading }}</h2>
+
+                        {%- if subtitle != blank -%}
+                            <p class="mt-1
+                                xl:mt-4
+                                text-1xl 
+                                xl:text-3xl 
+                                font-bold
+                                tracking-normal
+                                max-w-[20rem]
+                                mx-auto
+                                xl:mx-0
+                                md:max-w-full
+                                text-center">{{ subtitle }}</p>
+                        {%- endif -%}
+
+                        {%- if popup_enable
+                            and button_label != blank -%}
+                            <div class="text-center mt-6 xl:mt-10">
+                                <modal-opener class="no-js-hidden" data-modal="#Modal-{{ section.id }}">
+                                    <button class="btn" type="button" aria-haspopup="dialog">
+                                        {{ button_label }}
+                                    </button>
+                                </modal-opener>
+                            </div>
+                        {%- else -%}
+                            {%- if button_label != blank
+                                and button_link != blank -%}
+                                <div class="text-center mt-6 xl:mt-10">
+                                    <a href="{{ button_link }}" class="btn">{{ button_label }}</a>
+                                </div>
+                            {%- endif -%}
+                        {%- endif -%}
+                    </div>
+                {%- endif -%}
+              	
+              	{%- if _bg_image_mobile -%}
+              	<div class="md:hidden relative">
+              		{%- render 'img', image: _bg_image_mobile, responsive: true -%}
+                  
+                  	{%- if note != blank -%}
+                        <div class="absolute
+                            z-10
+                            w-full
+                            bottom-8
+                            text-center
+                            text-sm
+                            text-silver
+                            uppercase
+                            px-4">
+                            {{ note }}
+                        </div>
+                    {%- endif -%}
+              	</div>
+              	{%- endif -%}
+
+                {%- if note != blank -%}
+                    <div class="absolute
+                        {% if content_alignment == 'left' %}
+                            left-[5%]
+                        {%- else -%}
+                            right-[5%]
+                        {% endif %}
+                        z-10
+                        w-[calc(100%_-_4rem)]
+                        xl:w-full
+                        xl:max-w-[71.4rem]
+                        bottom-8
+                        xl:bottom-16
+                        text-center
+                        text-sm
+                        text-silver
+                        uppercase">
+                        {{ note }}
+                    </div>
+                {%- endif -%}
+            </div>
+        </div>
+    </section>
+
+    {%- if popup_enable != blank -%}
+        <modal-dialog id="Modal-{{ section.id }}">
+            <div role="dialog" aria-label="" aria-modal="true" class="popup__content !p-0" tabindex="-1">
+                <button id="ModalClose-animated-banner" type="button" class="popup__close !top-8 !right-8" aria-label="{{ 'accessibility.close' | t }}">{%- render 'icon-close' -%}</button>
+                <div class="popup__inner xl:grid xl:grid-cols-[1fr_35.6rem] xl:items-center xl:gap-1 !p-0">
+                    <div class="p-8 xl:py-14 xl:pl-16 xl:pr-0">
+                        {%- if popup_title != blank -%}
+                            <h2 class="max-w-[90%]
+                                xl:max-w-[100%]
+                                text-1xl 
+                                xl:text-4xl
+                                mb-0 
+                                styled-span">{{ popup_title }}</h2>
+                        {%- endif -%}
+        
+                        {%- if popup_subtitle != blank -%}
+                            <p class="mt-2 font-bold text-lg xl:text-1xl tracking-normal">{{ popup_subtitle }}</p>
+                        {%- endif -%}
+        
+                        {%- if popup_content != blank -%}
+                            <p class="mt-2 text-md xl:text-lg tracking-normal">{{ popup_content }}</p>
+                        {%- endif -%}
+
+                        <ul class="mt-8 xl:grid grid-cols-2 gap-6">
+                            {%- for i in (1..4) -%}
+                                {%- capture popup_title_icon_i -%}popup_title_icon_{{ i }}{%- endcapture -%}
+                                {%- capture popup_subtitle_icon_i -%}popup_subtitle_icon_{{ i }}{%- endcapture -%}
+                                {%- capture popup_icon_icon_i -%}popup_icon_icon_{{ i }}{%- endcapture -%}
+                                {%- liquid
+                                    assign popup_title_icon = section.settings[popup_title_icon_i] | escape
+                                    assign popup_subtitle_icon = section.settings[popup_subtitle_icon_i] | escape
+                                    assign popup_icon_icon = section.settings[popup_icon_icon_i]
+                                -%}
+                                {%- if popup_title_icon != blank -%}
+                                    <li class="{% unless forloop.last %}mb-8 xl:mb-0{% endunless %}">
+                                        <div class="flex items-center">
+                                            {%- if popup_icon_icon != blank -%}
+                                                <div class="w-28 mr-6 flex justify-center items-center">
+                                                    {{ popup_icon_icon }}
+                                                </div>
+                                            {%- endif -%}
+    
+                                            <div>
+                                                <h4 class="text-1xl xl:text-3xl mb-0">{{ popup_title_icon }}</h4>
+                                                {%- if popup_subtitle_icon != blank -%}
+                                                    <p class="text-lg tracking-normal">{{ popup_subtitle_icon }}</p>
+                                                {%- endif -%}
+                                            </div>
+                                        </div>
+                                    </li>
+                                {%- endif -%}
+                            {%- endfor -%}
+                        </ul>
+                    </div>
+
+                    {%- if popup_image -%}
+                        <div class="relative h-[41rem] z-10 hidden xl:block">
+                            {%- render 'img', image: popup_image -%}
+                        </div>
+                    {%- endif -%}
+                </div>
+            </div>
+        </modal-dialog>
+    {%- endif -%}
+
+    <style>
+        #animate-bg-{{ section.id }} {
+            /*height: 66rem;
+          	background-image:url({{ bg_image_mobile }});*/
+        }
+      
+      	@media only screen and (max-width: 767px) {
+          	#animate-bg-{{ section.id }} {
+         	 	background-image: none !important;
+            }
+        }
+      
+      	@media only screen and (min-width: 768px) {
+            #animate-bg-{{ section.id }} {
+              	height: 66rem;
+                background-image:url({{ bg_image }});
+            }
+        }
+
+        @media only screen and (min-width: 1280px) {
+            #animate-bg-{{ section.id }} {
+                height: 0;
+                padding-bottom: {{ 1 | divided_by: bg_image.aspect_ratio | times: 100 }}%;
+            }
+        }
+    </style>
+
+    {%- if section.blocks.size > 1 -%}
+        <script>
+            let bg_images = [];
+          	let bg_images_mobile = [];
+        </script>
+        {%- for block in section.blocks -%}
+            {%- assign image = block.settings.image -%}
+			{%- assign image_mobile = block.settings.image_mobile -%}
+            {%- if image -%}
+                {%- assign image_url = image | image_url: width: 1820 -%}
+                <script>
+                    bg_images.push('{{ image_url }}')
+                </script>
+            {%- endif -%}
+			{%- if image_mobile -%}
+                {%- assign image_url = image_mobile | image_url: width: 1820 -%}
+                <script>
+                    bg_images_mobile.push('{{ image_url }}')
+                </script>
+            {%- endif -%}
+        {%- endfor -%}
+        <script>
+            window.addEventListener('DOMContentLoaded', (event) => {
+                let animate_bg_container = document.getElementById('animate-bg-{{ section.id }}'),
+                    i = 0,
+                    images = window.innerWidth <= 768 ? bg_images_mobile : bg_images
+                                                                   
+                setInterval(function()  {
+                    i++
+					
+                    if (i == images.length) i = 0
+
+                    animate_bg_container.style.backgroundImage = 'url(' + images[i] + ')'
+                }, 750)
+            })
+        </script>
+    {%- endif -%}
+{%- endif -%}
+
+{% schema %}
+{
+	"name":"Animated banner",
+    "max_blocks": 3,
+	"settings":[
+        {
+            "type": "number",
+            "id": "padding_top",
+            "label": "Padding top (rem)",
+            "default": 0,
+            "info": "1rem = 10px"
+        },
+        {
+            "type": "number",
+            "id": "padding_bottom",
+            "label": "Padding bottom (rem)",
+            "default": 0,
+            "info": "1rem = 10px"
+        },
+        {
+            "type": "number",
+            "id": "margin_top",
+            "label": "Margin top (rem)",
+            "default": 100,
+            "info": "1rem = 10px"
+        },
+        {
+            "type": "number",
+            "id": "margin_bottom",
+            "label": "Margin bottom (rem)",
+            "default": 100,
+            "info": "1rem = 10px"
+        },
+        {
+            "type": "select",
+            "id": "content_align",
+            "label": "Content alignment",
+            "options": [
+                {
+                    "value": "left",
+                    "label": "Left"
+                },
+                {
+                    "value": "right",
+                    "label": "Right"
+                }
+            ],
+            "default": "left"
+        },
+		{
+			"type": "text",
+			"id": "title",
+			"label": "Title"
+		},
+        {
+			"type": "text",
+			"id": "subtitle",
+			"label": "Subtitle"
+		},
+        {
+			"type": "text",
+			"id": "button_label",
+			"label": "Button label"
+		},
+        {
+			"type": "text",
+			"id": "button_link",
+			"label": "Button link"
+		},
+        {
+			"type": "text",
+			"id": "note",
+			"label": "Note"
+		},
+        {
+			"type": "header",
+			"content": "Popup"
+		},
+        {
+          "type": "checkbox",
+          "id": "popup_enable",
+          "label": "Enable popup"
+        },
+        {
+          "type": "text",
+          "id": "popup_title",
+          "label": "Title"
+        },
+        {
+          "type": "text",
+          "id": "popup_subtitle",
+          "label": "Subtitle"
+        },
+        {
+          "type": "richtext",
+          "id": "popup_content",
+          "label": "Content"
+        },
+        {
+          "type": "image_picker",
+          "id": "popup_image",
+          "label": "Image"
+        },
+        {
+          "type": "text",
+          "id": "popup_title_icon_1",
+          "label": "Icon title 1"
+        },
+        {
+          "type": "text",
+          "id": "popup_subtitle_icon_1",
+          "label": "Icon subtitle 1"
+        },
+        {
+          "type": "html",
+          "id": "popup_icon_icon_1",
+          "label": "Icon 1"
+        },
+        {
+          "type": "text",
+          "id": "popup_title_icon_2",
+          "label": "Icon title 2"
+        },
+        {
+          "type": "text",
+          "id": "popup_subtitle_icon_2",
+          "label": "Icon subtitle 2"
+        },
+        {
+          "type": "html",
+          "id": "popup_icon_icon_2",
+          "label": "Icon 2"
+        },
+        {
+          "type": "text",
+          "id": "popup_title_icon_3",
+          "label": "Icon title 3"
+        },
+        {
+          "type": "text",
+          "id": "popup_subtitle_icon_3",
+          "label": "Icon subtitle 3"
+        },
+        {
+          "type": "html",
+          "id": "popup_icon_icon_3",
+          "label": "Icon 3"
+        },
+        {
+          "type": "text",
+          "id": "popup_title_icon_4",
+          "label": "Icon title 4"
+        },
+        {
+          "type": "text",
+          "id": "popup_subtitle_icon_4",
+          "label": "Icon subtitle 4"
+        },
+        {
+          "type": "html",
+          "id": "popup_icon_icon_4",
+          "label": "Icon 4"
+        }
+	],
+    "blocks": [
+        {
+            "type": "image",
+            "name": "image",
+            "settings": [
+                {
+                    "type": "image_picker",
+                    "id": "image",
+                    "label": "Image"
+                },
+				{
+                    "type": "image_picker",
+                    "id": "image_mobile",
+                    "label": "Image mobile"
+                }
+            ]
+        }
+    ],
+	"presets":[
+		{
+			"name": "Animated banner"
+		}
+	]
+}
+{% endschema %}
